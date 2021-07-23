@@ -6,8 +6,11 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls,
   ToolsAPI, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ExtDlgs,
-  CCE.OTA.Utils,
-  System.Generics.Collections;
+  System.IOUtils,
+  CCE.Core.Interfaces,
+  CCE.Core.Project,
+  CCE.Helpers.CheckListBox,
+  System.Generics.Collections, Vcl.CheckLst, Vcl.Menus, Vcl.Buttons;
 
 type
   TCCEWizardForms = class(TForm)
@@ -26,6 +29,20 @@ type
     edtCoverageExeName: TLabeledEdit;
     btnSelectCodeCoverage: TButton;
     tsPaths: TTabSheet;
+    chklstPaths: TCheckListBox;
+    Label1: TLabel;
+    chkLstUnits: TCheckListBox;
+    Label2: TLabel;
+    pmPaths: TPopupMenu;
+    SelectAll1: TMenuItem;
+    UnselectAll1: TMenuItem;
+    pmUnits: TPopupMenu;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    RemovePath1: TMenuItem;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    ChgeckUnits1: TMenuItem;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnPreviousClick(Sender: TObject);
@@ -33,12 +50,29 @@ type
     procedure btnSelectExeNameClick(Sender: TObject);
     procedure btnSelectCodeCoverageClick(Sender: TObject);
     procedure btnSelectMapFileClick(Sender: TObject);
+    procedure chklstPathsClick(Sender: TObject);
+    procedure SelectAll1Click(Sender: TObject);
+    procedure UnselectAll1Click(Sender: TObject);
+    procedure MenuItem1Click(Sender: TObject);
+    procedure MenuItem2Click(Sender: TObject);
+    procedure RemovePath1Click(Sender: TObject);
+    procedure ChgeckUnits1Click(Sender: TObject);
   private
-    FProject: IOTAProject;
-    FProjectUtils: TCCEOTAProject;
+    FProject: ICCEProject;
     { Private declarations }
 
+    procedure OnRemoveUnit(AUnit: String);
+    procedure OnRemovePath(APath: String);
+    procedure OnAddUnit(AUnit: String);
+    procedure OnAddPath(APath: String);
+
     procedure searchFile(FilterText, FilterExt: string; AComponent: TLabeledEdit);
+
+    procedure ListPaths;
+    procedure ListUnits(Path: String);
+
+    procedure SelectAllPaths;
+    procedure SelectAllUnits;
 
     procedure InitialValues;
     procedure ApplyTheme;
@@ -67,7 +101,6 @@ var
   i: Integer;
 {$ENDIF}
 begin
-
   {$IF CompilerVersion > 31.0}
   theme := (BorlandIDEServices as IOTAIDEThemingServices250);
   theme.RegisterFormClass(TCCEWizardForms);
@@ -116,21 +149,34 @@ begin
   searchFile('Map File', 'map', edtMapFileName);
 end;
 
+procedure TCCEWizardForms.ChgeckUnits1Click(Sender: TObject);
+begin
+//  FProject.
+end;
+
 procedure TCCEWizardForms.btnNextClick(Sender: TObject);
 begin
   SelectPageNext;
 end;
 
+procedure TCCEWizardForms.chklstPathsClick(Sender: TObject);
+begin
+  ListUnits(chklstPaths.Value);
+end;
+
 constructor TCCEWizardForms.create(AOwner: TComponent; Project: IOTAProject);
 begin
   inherited create(AOwner);
-  FProject := Project;
-  FProjectUtils := TCCEOTAProject.create(Project);
+  FProject := TCCECoreProject.New(Project);
+  FProject
+    .OnAddUnit(Self.OnAddUnit)
+    .OnAddPath(Self.OnAddPath)
+    .OnRemoveUnit(Self.OnRemoveUnit)
+    .OnRemovePath(Self.OnRemovePath);
 end;
 
 destructor TCCEWizardForms.Destroy;
 begin
-  FProjectUtils.Free;
   inherited;
 end;
 
@@ -139,6 +185,7 @@ begin
   HideTabs;
   InitialValues;
 
+  ListPaths;
 end;
 
 procedure TCCEWizardForms.FormShow(Sender: TObject);
@@ -160,8 +207,77 @@ end;
 
 procedure TCCEWizardForms.InitialValues;
 begin
-  edtExeName.Text := FProjectUtils.ExeName;
-  edtMapFileName.Text := FProjectUtils.MapFileName;
+  edtExeName.Text := FProject.ExeName;
+  edtMapFileName.Text := FProject.MapFileName;
+
+  ListPaths;
+  SelectAllPaths;
+  SelectAllUnits;
+end;
+
+procedure TCCEWizardForms.ListPaths;
+var
+  paths: TArray<String>;
+  i: Integer;
+begin
+  paths := FProject.ListAllPaths;
+  for i := 0 to Pred(Length(paths)) do
+    if TDirectory.Exists(paths[i]) then
+    begin
+      chklstPaths.AddOrSet(paths[i]);
+
+      ListUnits(Paths[i]);
+    end;
+end;
+
+procedure TCCEWizardForms.ListUnits(Path: String);
+var
+  units: TArray<String>;
+  i: Integer;
+begin
+  units := FProject.ListAllUnits(Path);
+  for i := 0 to Pred(Length( units )) do
+    chkLstUnits.AddOrSet(units[i]);
+end;
+
+procedure TCCEWizardForms.MenuItem1Click(Sender: TObject);
+begin
+  chkLstUnits.SelectAll;
+end;
+
+procedure TCCEWizardForms.MenuItem2Click(Sender: TObject);
+begin
+  chkLstUnits.UnSelectAll;
+end;
+
+procedure TCCEWizardForms.OnAddPath(APath: String);
+begin
+  chklstPaths.Select(APath);
+end;
+
+procedure TCCEWizardForms.OnAddUnit(AUnit: String);
+begin
+  chkLstUnits.Select(AUnit);
+end;
+
+procedure TCCEWizardForms.OnRemovePath(APath: String);
+begin
+  chklstPaths.UnSelect(APath);
+end;
+
+procedure TCCEWizardForms.OnRemoveUnit(AUnit: String);
+begin
+  chkLstUnits.UnSelect(AUnit);
+end;
+
+procedure TCCEWizardForms.RemovePath1Click(Sender: TObject);
+var
+  path: String;
+begin
+  path := chklstPaths.Value;
+  FProject.RemoveAllUnits(path);
+  FProject.RemovePath(path);
+
 end;
 
 procedure TCCEWizardForms.searchFile(FilterText, FilterExt: string; AComponent: TLabeledEdit);
@@ -169,6 +285,29 @@ begin
   openTextDialog.Filter := Format('%s | *.%s', [FilterText, FilterExt]);
   if openTextDialog.Execute then
     AComponent.Text := openTextDialog.FileName;
+end;
+
+procedure TCCEWizardForms.SelectAll1Click(Sender: TObject);
+begin
+  SelectAllPaths;
+end;
+
+procedure TCCEWizardForms.SelectAllPaths;
+var
+  i: Integer;
+begin
+  chklstPaths.SelectAll;
+  for i := 0 to chklstPaths.Items.Count - 1 do
+    FProject.AddPath(chklstPaths.Value(i));
+end;
+
+procedure TCCEWizardForms.SelectAllUnits;
+var
+  i: Integer;
+begin
+  chkLstUnits.SelectAll;
+  for i := 0 to chkLstUnits.Items.Count - 1 do
+    FProject.AddUnit(chkLstUnits.Value(i));
 end;
 
 procedure TCCEWizardForms.SelectPageNext;
@@ -183,6 +322,11 @@ begin
   pgcWizard.SelectNextPage(False, False);
   btnPrevious.Enabled := pgcWizard.ActivePageIndex > 0;
   btnNext.Enabled := True;
+end;
+
+procedure TCCEWizardForms.UnselectAll1Click(Sender: TObject);
+begin
+  chklstPaths.UnSelectAll;
 end;
 
 end.

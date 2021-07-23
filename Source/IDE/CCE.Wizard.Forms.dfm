@@ -2,7 +2,7 @@ object CCEWizardForms: TCCEWizardForms
   Left = 0
   Top = 0
   BorderStyle = bsDialog
-  ClientHeight = 354
+  ClientHeight = 486
   ClientWidth = 727
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,7 +20,7 @@ object CCEWizardForms: TCCEWizardForms
     Left = 0
     Top = 41
     Width = 727
-    Height = 272
+    Height = 404
     ActivePage = tsPaths
     Align = alClient
     TabOrder = 0
@@ -88,11 +88,44 @@ object CCEWizardForms: TCCEWizardForms
     object tsPaths: TTabSheet
       Caption = 'Paths'
       ImageIndex = 1
+      object Label1: TLabel
+        Left = 3
+        Top = 5
+        Width = 28
+        Height = 13
+        Caption = 'Paths'
+      end
+      object Label2: TLabel
+        Left = 3
+        Top = 197
+        Width = 27
+        Height = 13
+        Caption = 'Units'
+      end
+      object chklstPaths: TCheckListBox
+        Left = 3
+        Top = 24
+        Width = 702
+        Height = 145
+        ItemHeight = 13
+        PopupMenu = pmPaths
+        TabOrder = 0
+        OnClick = chklstPathsClick
+      end
+      object chkLstUnits: TCheckListBox
+        Left = 3
+        Top = 216
+        Width = 702
+        Height = 158
+        ItemHeight = 13
+        PopupMenu = pmUnits
+        TabOrder = 1
+      end
     end
   end
   object pnlBottom: TPanel
     Left = 0
-    Top = 313
+    Top = 445
     Width = 727
     Height = 41
     Align = alBottom
@@ -148,5 +181,41 @@ object CCEWizardForms: TCCEWizardForms
     Filter = 'Test Project |*.exe|Map Project|*.map'
     Left = 12
     Top = 313
+  end
+  object pmPaths: TPopupMenu
+    Left = 368
+    object SelectAll1: TMenuItem
+      Caption = 'Check All'
+      OnClick = SelectAll1Click
+    end
+    object UnselectAll1: TMenuItem
+      Caption = 'UnCheck All'
+      OnClick = UnselectAll1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object ChgeckUnits1: TMenuItem
+      Caption = 'Check Units'
+      OnClick = ChgeckUnits1Click
+    end
+    object RemovePath1: TMenuItem
+      Caption = 'UnCheck Units'
+      OnClick = RemovePath1Click
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+  end
+  object pmUnits: TPopupMenu
+    Left = 408
+    object MenuItem1: TMenuItem
+      Caption = 'Select All'
+      OnClick = MenuItem1Click
+    end
+    object MenuItem2: TMenuItem
+      Caption = 'UnSelect All'
+      OnClick = MenuItem2Click
+    end
   end
 end

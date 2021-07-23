@@ -36,6 +36,8 @@ contains
   CCE.ContextMenu in 'IDE\CCE.ContextMenu.pas',
   CCE.Constants in 'Core\CCE.Constants.pas',
   CCE.Registry in 'IDE\CCE.Registry.pas',
-  CCE.OTA.Utils in 'Core\CCE.OTA.Utils.pas';
+  CCE.Core.Project in 'Core\CCE.Core.Project.pas',
+  CCE.Core.Interfaces in 'Core\CCE.Core.Interfaces.pas',
+  CCE.Helpers.CheckListBox in 'Core\CCE.Helpers.CheckListBox.pas';
 
 end.
