@@ -7,6 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls,
   ToolsAPI, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ExtDlgs,
   System.IOUtils,
+  Vcl.FileCtrl,
   CCE.Core.Interfaces,
   CCE.Core.Project,
   CCE.Helpers.CheckListBox,
@@ -23,7 +24,6 @@ type
     lblTitle: TLabel;
     edtExeName: TLabeledEdit;
     btnSelectExeName: TButton;
-    openTextDialog: TOpenTextFileDialog;
     edtMapFileName: TLabeledEdit;
     btnSelectMapFile: TButton;
     edtCoverageExeName: TLabeledEdit;
@@ -43,6 +43,13 @@ type
     N1: TMenuItem;
     N2: TMenuItem;
     ChgeckUnits1: TMenuItem;
+    edtOutputReport: TLabeledEdit;
+    btnOutputReport: TButton;
+    openTextDialog: TOpenTextFileDialog;
+    grpOutputFormat: TGroupBox;
+    chkXmlReport: TCheckBox;
+    chkHtmlReport: TCheckBox;
+    chkEmmaReport: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnPreviousClick(Sender: TObject);
@@ -50,13 +57,12 @@ type
     procedure btnSelectExeNameClick(Sender: TObject);
     procedure btnSelectCodeCoverageClick(Sender: TObject);
     procedure btnSelectMapFileClick(Sender: TObject);
-    procedure chklstPathsClick(Sender: TObject);
     procedure SelectAll1Click(Sender: TObject);
     procedure UnselectAll1Click(Sender: TObject);
     procedure MenuItem1Click(Sender: TObject);
     procedure MenuItem2Click(Sender: TObject);
     procedure RemovePath1Click(Sender: TObject);
-    procedure ChgeckUnits1Click(Sender: TObject);
+    procedure btnOutputReportClick(Sender: TObject);
   private
     FProject: ICCEProject;
     { Private declarations }
@@ -66,7 +72,8 @@ type
     procedure OnAddUnit(AUnit: String);
     procedure OnAddPath(APath: String);
 
-    procedure searchFile(FilterText, FilterExt: string; AComponent: TLabeledEdit);
+    procedure searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);
+    procedure selectFolder(AComponent: TCustomEdit);
 
     procedure ListPaths;
     procedure ListUnits(Path: String);
@@ -149,19 +156,14 @@ begin
   searchFile('Map File', 'map', edtMapFileName);
 end;
 
-procedure TCCEWizardForms.ChgeckUnits1Click(Sender: TObject);
-begin
-//  FProject.
-end;
-
 procedure TCCEWizardForms.btnNextClick(Sender: TObject);
 begin
   SelectPageNext;
 end;
 
-procedure TCCEWizardForms.chklstPathsClick(Sender: TObject);
+procedure TCCEWizardForms.btnOutputReportClick(Sender: TObject);
 begin
-  ListUnits(chklstPaths.Value);
+  selectFolder(edtOutputReport);
 end;
 
 constructor TCCEWizardForms.create(AOwner: TComponent; Project: IOTAProject);
@@ -252,22 +254,22 @@ end;
 
 procedure TCCEWizardForms.OnAddPath(APath: String);
 begin
-  chklstPaths.Select(APath);
+  chklstPaths.Check(APath);
 end;
 
 procedure TCCEWizardForms.OnAddUnit(AUnit: String);
 begin
-  chkLstUnits.Select(AUnit);
+  chkLstUnits.Check(AUnit);
 end;
 
 procedure TCCEWizardForms.OnRemovePath(APath: String);
 begin
-  chklstPaths.UnSelect(APath);
+  chklstPaths.UnCheck(APath);
 end;
 
 procedure TCCEWizardForms.OnRemoveUnit(AUnit: String);
 begin
-  chkLstUnits.UnSelect(AUnit);
+  chkLstUnits.UnCheck(AUnit);
 end;
 
 procedure TCCEWizardForms.RemovePath1Click(Sender: TObject);
@@ -280,7 +282,7 @@ begin
 
 end;
 
-procedure TCCEWizardForms.searchFile(FilterText, FilterExt: string; AComponent: TLabeledEdit);
+procedure TCCEWizardForms.searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);
 begin
   openTextDialog.Filter := Format('%s | *.%s', [FilterText, FilterExt]);
   if openTextDialog.Execute then
@@ -308,6 +310,15 @@ begin
   chkLstUnits.SelectAll;
   for i := 0 to chkLstUnits.Items.Count - 1 do
     FProject.AddUnit(chkLstUnits.Value(i));
+end;
+
+procedure TCCEWizardForms.selectFolder(AComponent: TCustomEdit);
+var
+  path: string;
+begin
+  path := FProject.ProjectPath;
+  if SelectDirectory('Select Directory', '', path) then
+    AComponent.Text := path;
 end;
 
 procedure TCCEWizardForms.SelectPageNext;

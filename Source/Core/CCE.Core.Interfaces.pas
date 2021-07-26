@@ -9,6 +9,7 @@ uses
 type
   ICCEProject = interface
     ['{676756F9-BEBC-4FCB-90AE-0B9843F7D126}']
+    function ProjectPath: string;
     function OutputPath: string;
     function ExeName: String;
     function MapFileName: string;

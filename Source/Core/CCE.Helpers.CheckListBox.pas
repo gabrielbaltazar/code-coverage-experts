@@ -27,8 +27,8 @@ type TCheckListBoxHelper = class helper for TCheckListBox
     function SelectAll: TCheckListBox;
     function UnSelectAll: TCheckListBox;
 
-    function Select(Value: String): TCheckListBox;
-    function UnSelect(Value: String): TCheckListBox;
+    function Check(Value: String): TCheckListBox;
+    function UnCheck(Value: String): TCheckListBox;
 end;
 
 implementation
@@ -87,7 +87,7 @@ begin
   Self.Items.Delete(Index);
 end;
 
-function TCheckListBoxHelper.Select(Value: String): TCheckListBox;
+function TCheckListBoxHelper.Check(Value: String): TCheckListBox;
 begin
   result := Self;
   Checked[Items.IndexOf(Value)] := True;
@@ -99,7 +99,7 @@ begin
   Self.CheckAll(TCheckBoxState.cbChecked);
 end;
 
-function TCheckListBoxHelper.UnSelect(Value: String): TCheckListBox;
+function TCheckListBoxHelper.UnCheck(Value: String): TCheckListBox;
 begin
   result := Self;
   Checked[Items.IndexOf(Value)] := False;

@@ -24,7 +24,10 @@ type TCCECoreProject = class(TInterfacedObject, ICCEProject)
     FOnRemoveUnit: TProc<String>;
     FOnRemovePath: TProc<String>;
 
+    function ProjectPath: string;
     function GetSearchPaths: TList<String>;
+
+    function RelToAbs(const RelPath, BasePath: string): string;
   public
     function OutputPath: string;
     function ExeName: String;
@@ -51,6 +54,12 @@ type TCCECoreProject = class(TInterfacedObject, ICCEProject)
     class function New(Project: IOTAProject): ICCEProject;
     destructor Destroy; override;
 end;
+
+function PathCanonicalize(lpszDst: PChar; lpszSrc: PChar): LongBool; stdcall;
+  external 'shlwapi.dll' name 'PathCanonicalizeW';
+
+function PathRelativePathTo(pszPath: PChar; pszFrom: PChar; dwAttrFrom: DWORD;
+  pszTo: PChar; dwAtrTo: DWORD): LongBool; stdcall; external 'shlwapi.dll' name 'PathRelativePathToW';
 
 implementation
 
@@ -114,6 +123,7 @@ end;
 function TCCECoreProject.GetSearchPaths: TList<String>;
 var
   searchPath: TStrings;
+  path: string;
   i: Integer;
 begin
   searchPath := TStringList.Create;
@@ -122,7 +132,10 @@ begin
     try
       FActiveConfig.GetValues(sUnitSearchPath, searchPath, True);
       for i := 0 to Pred(searchPath.Count) do
-        result.Add(searchPath[i]);
+      begin
+        path := RelToAbs(searchPath[i], ProjectPath);
+        result.Add(path);
+      end;
 
     except
       result.Free;
@@ -230,16 +243,29 @@ begin
   result := Result.Replace('\\', '\');
 end;
 
+function TCCECoreProject.ProjectPath: string;
+begin
+  result := ExtractFilePath(FProject.FileName);
+end;
+
+function TCCECoreProject.RelToAbs(const RelPath, BasePath: string): string;
+var
+  Dst: array[0..259] of char;
+begin
+  PathCanonicalize(@Dst[0], PChar(IncludeTrailingBackslash(BasePath) + RelPath));
+  result := Dst;
+end;
+
 function TCCECoreProject.RemoveAllUnits(Path: String): ICCEProject;
 var
   i: Integer;
   unitPath: string;
 begin
   result := Self;
-  for i := 0 to Pred(FSelectedUnits.Count) do
+  for i := Pred(FSelectedUnits.Count) downto 0 do
   begin
     unitPath := ExtractFilePath(FSelectedUnits[i]);
-    if Path.ToLower = Copy(unitPath.ToLower, 1, Path.Length).ToLower then
+    if Path.ToLower = unitPath.ToLower then
       RemoveUnit(FSelectedUnits[i]);
   end;
 end;

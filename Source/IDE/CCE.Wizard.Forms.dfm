@@ -3,7 +3,7 @@ object CCEWizardForms: TCCEWizardForms
   Top = 0
   BorderStyle = bsDialog
   ClientHeight = 486
-  ClientWidth = 727
+  ClientWidth = 904
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,9 +19,9 @@ object CCEWizardForms: TCCEWizardForms
   object pgcWizard: TPageControl
     Left = 0
     Top = 41
-    Width = 727
+    Width = 904
     Height = 404
-    ActivePage = tsPaths
+    ActivePage = tsFiles
     Align = alClient
     TabOrder = 0
     object tsFiles: TTabSheet
@@ -84,6 +84,62 @@ object CCEWizardForms: TCCEWizardForms
         TabOrder = 1
         OnClick = btnSelectCodeCoverageClick
       end
+      object edtOutputReport: TLabeledEdit
+        Left = 11
+        Top = 191
+        Width = 607
+        Height = 21
+        EditLabel.Width = 76
+        EditLabel.Height = 13
+        EditLabel.Caption = 'Output Report'
+        TabOrder = 6
+        Text = '.\Report'
+      end
+      object btnOutputReport: TButton
+        Left = 624
+        Top = 189
+        Width = 33
+        Height = 25
+        Caption = '...'
+        TabOrder = 7
+        OnClick = btnOutputReportClick
+      end
+      object grpOutputFormat: TGroupBox
+        Left = 11
+        Top = 232
+        Width = 494
+        Height = 121
+        Caption = 'Output Format'
+        TabOrder = 8
+        object chkXmlReport: TCheckBox
+          Left = 16
+          Top = 24
+          Width = 393
+          Height = 17
+          Caption = 'XML coverage output as '#39'CodeCoverage_Summary.xml'#39' (-xml)'
+          Checked = True
+          State = cbChecked
+          TabOrder = 0
+        end
+        object chkHtmlReport: TCheckBox
+          Left = 16
+          Top = 47
+          Width = 393
+          Height = 17
+          Caption = 'HTML coverage output as '#39'CodeCoverage_Summary.html'#39' (-html)'
+          Checked = True
+          State = cbChecked
+          TabOrder = 1
+        end
+        object chkEmmaReport: TCheckBox
+          Left = 16
+          Top = 70
+          Width = 393
+          Height = 17
+          Caption = 'EMMA coverage output as '#39'coverage.es'#39' (-emma)'
+          TabOrder = 2
+        end
+      end
     end
     object tsPaths: TTabSheet
       Caption = 'Paths'
@@ -105,17 +161,16 @@ object CCEWizardForms: TCCEWizardForms
       object chklstPaths: TCheckListBox
         Left = 3
         Top = 24
-        Width = 702
+        Width = 878
         Height = 145
         ItemHeight = 13
         PopupMenu = pmPaths
         TabOrder = 0
-        OnClick = chklstPathsClick
       end
       object chkLstUnits: TCheckListBox
         Left = 3
         Top = 216
-        Width = 702
+        Width = 878
         Height = 158
         ItemHeight = 13
         PopupMenu = pmUnits
@@ -126,7 +181,7 @@ object CCEWizardForms: TCCEWizardForms
   object pnlBottom: TPanel
     Left = 0
     Top = 445
-    Width = 727
+    Width = 904
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
@@ -153,7 +208,7 @@ object CCEWizardForms: TCCEWizardForms
   object pnlTop: TPanel
     Left = 0
     Top = 0
-    Width = 727
+    Width = 904
     Height = 41
     Align = alTop
     BevelOuter = bvNone
@@ -162,11 +217,11 @@ object CCEWizardForms: TCCEWizardForms
       AlignWithMargins = True
       Left = 15
       Top = 3
-      Width = 159
+      Width = 160
       Height = 35
       Margins.Left = 15
       Align = alLeft
-      Caption = 'Code Coverage Wizard'
+      Caption = 'Code Coverage Experts'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -176,11 +231,6 @@ object CCEWizardForms: TCCEWizardForms
       Layout = tlCenter
       ExplicitHeight = 21
     end
-  end
-  object openTextDialog: TOpenTextFileDialog
-    Filter = 'Test Project |*.exe|Map Project|*.map'
-    Left = 12
-    Top = 313
   end
   object pmPaths: TPopupMenu
     Left = 368
@@ -197,7 +247,6 @@ object CCEWizardForms: TCCEWizardForms
     end
     object ChgeckUnits1: TMenuItem
       Caption = 'Check Units'
-      OnClick = ChgeckUnits1Click
     end
     object RemovePath1: TMenuItem
       Caption = 'UnCheck Units'
@@ -217,5 +266,9 @@ object CCEWizardForms: TCCEWizardForms
       Caption = 'UnSelect All'
       OnClick = MenuItem2Click
     end
+  end
+  object openTextDialog: TOpenTextFileDialog
+    Left = 600
+    Top = 8
   end
 end
