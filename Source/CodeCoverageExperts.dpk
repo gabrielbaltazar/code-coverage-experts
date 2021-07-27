@@ -38,6 +38,9 @@ contains
   CCE.Registry in 'IDE\CCE.Registry.pas',
   CCE.Core.Project in 'Core\CCE.Core.Project.pas',
   CCE.Core.Interfaces in 'Core\CCE.Core.Interfaces.pas',
-  CCE.Helpers.CheckListBox in 'Core\CCE.Helpers.CheckListBox.pas';
+  CCE.Helpers.CheckListBox in 'Core\CCE.Helpers.CheckListBox.pas',
+  CCE.Core.Utils in 'Core\CCE.Core.Utils.pas',
+  CCE.Core.CodeCoverage in 'Core\CCE.Core.CodeCoverage.pas',
+  CCE.Helpers.TreeView in 'Core\CCE.Helpers.TreeView.pas';
 
 end.

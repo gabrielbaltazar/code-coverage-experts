@@ -21,7 +21,7 @@ object CCEWizardForms: TCCEWizardForms
     Top = 41
     Width = 904
     Height = 404
-    ActivePage = tsFiles
+    ActivePage = tsTreeView
     Align = alClient
     TabOrder = 0
     object tsFiles: TTabSheet
@@ -35,6 +35,9 @@ object CCEWizardForms: TCCEWizardForms
         EditLabel.Height = 13
         EditLabel.Caption = 'Delphi Project'
         TabOrder = 2
+        Text = 
+          'D:\Desenvolvimento\workspace\Delphi\FormacaoDelphiSenior\Tests\P' +
+          'rojetoBase\Bin\FormacaoERPTest.exe'
       end
       object btnSelectExeName: TButton
         Left = 623
@@ -54,6 +57,9 @@ object CCEWizardForms: TCCEWizardForms
         EditLabel.Height = 13
         EditLabel.Caption = 'Map File Project'
         TabOrder = 4
+        Text = 
+          'D:\Desenvolvimento\workspace\Delphi\FormacaoDelphiSenior\Tests\P' +
+          'rojetoBase\Bin\FormacaoERPTest.map'
       end
       object btnSelectMapFile: TButton
         Left = 624
@@ -107,9 +113,9 @@ object CCEWizardForms: TCCEWizardForms
       object grpOutputFormat: TGroupBox
         Left = 11
         Top = 232
-        Width = 494
-        Height = 121
-        Caption = 'Output Format'
+        Width = 606
+        Height = 141
+        Caption = 'Output'
         TabOrder = 8
         object chkXmlReport: TCheckBox
           Left = 16
@@ -139,6 +145,26 @@ object CCEWizardForms: TCCEWizardForms
           Caption = 'EMMA coverage output as '#39'coverage.es'#39' (-emma)'
           TabOrder = 2
         end
+        object chkLog: TCheckBox
+          Left = 16
+          Top = 93
+          Width = 105
+          Height = 17
+          Caption = 'Generate Log'
+          Checked = True
+          State = cbChecked
+          TabOrder = 3
+        end
+        object chkUseRelativePath: TCheckBox
+          Left = 16
+          Top = 116
+          Width = 129
+          Height = 17
+          Caption = 'Use Relative Path'
+          Checked = True
+          State = cbChecked
+          TabOrder = 4
+        end
       end
     end
     object tsPaths: TTabSheet
@@ -163,7 +189,13 @@ object CCEWizardForms: TCCEWizardForms
         Top = 24
         Width = 878
         Height = 145
-        ItemHeight = 13
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ItemHeight = 17
+        ParentFont = False
         PopupMenu = pmPaths
         TabOrder = 0
       end
@@ -172,9 +204,28 @@ object CCEWizardForms: TCCEWizardForms
         Top = 216
         Width = 878
         Height = 158
-        ItemHeight = 13
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ItemHeight = 17
+        ParentFont = False
         PopupMenu = pmUnits
         TabOrder = 1
+      end
+    end
+    object tsTreeView: TTabSheet
+      Caption = 'tsTreeView'
+      ImageIndex = 2
+      object tvPaths: TTreeView
+        Left = 11
+        Top = 16
+        Width = 414
+        Height = 345
+        Indent = 19
+        TabOrder = 0
+        OnClick = tvPathsClick
       end
     end
   end
@@ -187,8 +238,8 @@ object CCEWizardForms: TCCEWizardForms
     BevelOuter = bvNone
     TabOrder = 1
     object btnNext: TButton
-      Left = 396
-      Top = 16
+      Left = 324
+      Top = 6
       Width = 75
       Height = 25
       Caption = 'Next'
@@ -197,12 +248,21 @@ object CCEWizardForms: TCCEWizardForms
     end
     object btnPrevious: TButton
       Left = 224
-      Top = 16
+      Top = 6
       Width = 75
       Height = 25
       Caption = 'Previous'
       TabOrder = 1
       OnClick = btnPreviousClick
+    end
+    object btnFinish: TButton
+      Left = 436
+      Top = 6
+      Width = 75
+      Height = 25
+      Caption = 'Finish'
+      TabOrder = 2
+      OnClick = btnFinishClick
     end
   end
   object pnlTop: TPanel
@@ -257,7 +317,7 @@ object CCEWizardForms: TCCEWizardForms
     end
   end
   object pmUnits: TPopupMenu
-    Left = 408
+    Left = 448
     object MenuItem1: TMenuItem
       Caption = 'Select All'
       OnClick = MenuItem1Click

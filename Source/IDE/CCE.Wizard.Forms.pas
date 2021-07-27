@@ -10,7 +10,9 @@ uses
   Vcl.FileCtrl,
   CCE.Core.Interfaces,
   CCE.Core.Project,
+  CCE.Core.CodeCoverage,
   CCE.Helpers.CheckListBox,
+  CCE.Helpers.TreeView,
   System.Generics.Collections, Vcl.CheckLst, Vcl.Menus, Vcl.Buttons;
 
 type
@@ -50,6 +52,11 @@ type
     chkXmlReport: TCheckBox;
     chkHtmlReport: TCheckBox;
     chkEmmaReport: TCheckBox;
+    btnFinish: TButton;
+    chkLog: TCheckBox;
+    chkUseRelativePath: TCheckBox;
+    tsTreeView: TTabSheet;
+    tvPaths: TTreeView;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnPreviousClick(Sender: TObject);
@@ -63,9 +70,14 @@ type
     procedure MenuItem2Click(Sender: TObject);
     procedure RemovePath1Click(Sender: TObject);
     procedure btnOutputReportClick(Sender: TObject);
+    procedure btnFinishClick(Sender: TObject);
+    procedure tvPathsClick(Sender: TObject);
   private
     FProject: ICCEProject;
-    { Private declarations }
+    FTreeNodes: TDictionary<String, TTreeNode>;
+
+    function GetNode(APath: String): TTreeNode;
+    procedure AddPathInTreeView(APath: String);
 
     procedure OnRemoveUnit(AUnit: String);
     procedure OnRemovePath(APath: String);
@@ -100,6 +112,59 @@ implementation
 {$R *.dfm}
 
 { TCCEWizardForms }
+
+procedure TCCEWizardForms.AddPathInTreeView(APath: String);
+var
+  i: Integer;
+  list: TStringList;
+  nodeParent: TTreeNode;
+  node: TTreeNode;
+  text: String;
+  pathParent: String;
+  path: String;
+begin
+  list := TStringList.Create;
+  try
+    list.Delimiter := '\';
+    list.StrictDelimiter := True;
+    list.DelimitedText := APath;
+
+    nodeParent := nil;
+    pathParent := '';
+    for i := 0 to Pred(list.Count) do
+    begin
+      text := list[i];
+      if text = '' then
+        Continue;
+      path := path + text + '\';
+      node := GetNode(path);
+      if Assigned(node) then
+        Continue;
+
+      if i = 0 then
+      begin
+        nodeParent := tvPaths.Items.AddChild(nil, text);
+//        nodeParent.
+        FTreeNodes.Add(path, nodeParent);
+        nodeParent := nil;
+        Continue;
+      end;
+
+      pathParent := Copy(path, 1, path.length - text.Length - 1);
+      nodeParent := GetNode(pathParent);
+      if Assigned(nodeParent) then
+      begin
+        nodeParent := tvPaths.Items.AddChild(nodeParent, text);
+        FTreeNodes.Add(path, nodeParent);
+        nodeParent := nil;
+        Continue;
+      end;
+    end;
+
+  finally
+    list.Free;
+  end;
+end;
 
 procedure TCCEWizardForms.ApplyTheme;
 {$IF CompilerVersion > 31.0}
@@ -156,6 +221,23 @@ begin
   searchFile('Map File', 'map', edtMapFileName);
 end;
 
+procedure TCCEWizardForms.btnFinishClick(Sender: TObject);
+begin
+  TCCECoreCodeCoverage.New
+    .CodeCoverageFileName(edtCoverageExeName.Text)
+    .ExeFileName(edtExeName.Text)
+    .MapFileName(edtMapFileName.Text)
+    .OutputReport(edtOutputReport.Text)
+    .Paths(FProject.ListAllPaths)
+    .Units(FProject.ListAllUnits)
+    .GenerateHtml(chkHtmlReport.Checked)
+    .GenerateXml(chkXmlReport.Checked)
+    .GenerateEmma(chkEmmaReport.Checked)
+    .GenerateLog(chkLog.Checked)
+    .UseRelativePath(chkUseRelativePath.Checked)
+    .Save;
+end;
+
 procedure TCCEWizardForms.btnNextClick(Sender: TObject);
 begin
   SelectPageNext;
@@ -169,6 +251,7 @@ end;
 constructor TCCEWizardForms.create(AOwner: TComponent; Project: IOTAProject);
 begin
   inherited create(AOwner);
+  FTreeNodes := TDictionary<String, TTreeNode>.create;
   FProject := TCCECoreProject.New(Project);
   FProject
     .OnAddUnit(Self.OnAddUnit)
@@ -179,6 +262,7 @@ end;
 
 destructor TCCEWizardForms.Destroy;
 begin
+  FTreeNodes.Free;
   inherited;
 end;
 
@@ -186,13 +270,18 @@ procedure TCCEWizardForms.FormCreate(Sender: TObject);
 begin
   HideTabs;
   InitialValues;
-
-  ListPaths;
 end;
 
 procedure TCCEWizardForms.FormShow(Sender: TObject);
 begin
 //  ApplyTheme;
+end;
+
+function TCCEWizardForms.GetNode(APath: String): TTreeNode;
+begin
+  result := nil;
+  if FTreeNodes.ContainsKey(APath) then
+    result := FTreeNodes.Items[APath];
 end;
 
 procedure TCCEWizardForms.HideTabs;
@@ -209,8 +298,8 @@ end;
 
 procedure TCCEWizardForms.InitialValues;
 begin
-  edtExeName.Text := FProject.ExeName;
-  edtMapFileName.Text := FProject.MapFileName;
+//  edtExeName.Text := FProject.ExeName;
+//  edtMapFileName.Text := FProject.MapFileName;
 
   ListPaths;
   SelectAllPaths;
@@ -223,6 +312,8 @@ var
   i: Integer;
 begin
   paths := FProject.ListAllPaths;
+
+  {$REGION 'CheckList'}
   for i := 0 to Pred(Length(paths)) do
     if TDirectory.Exists(paths[i]) then
     begin
@@ -230,6 +321,12 @@ begin
 
       ListUnits(Paths[i]);
     end;
+  {$ENDREGION}
+
+  for i := 0 to Pred(Length(paths)) do
+    if TDirectory.Exists(paths[i]) then
+      AddPathInTreeView(Paths[i]);
+
 end;
 
 procedure TCCEWizardForms.ListUnits(Path: String);
@@ -333,6 +430,11 @@ begin
   pgcWizard.SelectNextPage(False, False);
   btnPrevious.Enabled := pgcWizard.ActivePageIndex > 0;
   btnNext.Enabled := True;
+end;
+
+procedure TCCEWizardForms.tvPathsClick(Sender: TObject);
+begin
+  showmessage(tvPaths.SelectedPath);
 end;
 
 procedure TCCEWizardForms.UnselectAll1Click(Sender: TObject);

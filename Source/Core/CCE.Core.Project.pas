@@ -34,7 +34,8 @@ type TCCECoreProject = class(TInterfacedObject, ICCEProject)
     function MapFileName: string;
 
     function ListAllPaths: TArray<String>;
-    function ListAllUnits(Path: String): TArray<String>;
+    function ListAllUnits(Path: String): TArray<String>; overload;
+    function ListAllUnits: TArray<String>; overload;
 
     function AddPath(Value: string): ICCEProject;
     function AddUnit(Value: string): ICCEProject;
@@ -180,6 +181,11 @@ begin
   finally
     paths.Free;
   end;
+end;
+
+function TCCECoreProject.ListAllUnits: TArray<String>;
+begin
+  result := FSelectedUnits.ToArray;
 end;
 
 function TCCECoreProject.ListAllUnits(Path: String): TArray<String>;
