@@ -16,6 +16,8 @@ type TCCEHelperTreeView = class helper for TTreeView
     function FindNode(ACaption: String; ALevel: Integer; ANodeParent: TTreeNode): TTreeNode;
 
     function SelectedPath: string;
+
+    procedure ExpandAll;
 end;
 
 implementation
@@ -95,6 +97,14 @@ begin
   finally
     list.Free;
   end;
+end;
+
+procedure TCCEHelperTreeView.ExpandAll;
+var
+  i: Integer;
+begin
+  for i := 0 to Pred(Items.Count) do
+    Items[i].Expand(True);
 end;
 
 function TCCEHelperTreeView.FindNode(ACaption: String; ALevel: Integer; ANodeParent: TTreeNode): TTreeNode;

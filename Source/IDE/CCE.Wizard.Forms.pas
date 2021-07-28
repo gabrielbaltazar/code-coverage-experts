@@ -13,7 +13,13 @@ uses
   CCE.Core.CodeCoverage,
   CCE.Helpers.CheckListBox,
   CCE.Helpers.TreeView,
-  System.Generics.Collections, Vcl.CheckLst, Vcl.Menus, Vcl.Buttons;
+  System.Generics.Collections, Vcl.CheckLst, Vcl.Menus, Vcl.Buttons,
+  System.ImageList, Vcl.ImgList;
+
+const
+  UNCHECKED_INDEX = 0;
+  CHECKED_INDEX = 1;
+  GRAYED_INDEX = 2;
 
 type
   TCCEWizardForms = class(TForm)
@@ -30,21 +36,6 @@ type
     btnSelectMapFile: TButton;
     edtCoverageExeName: TLabeledEdit;
     btnSelectCodeCoverage: TButton;
-    tsPaths: TTabSheet;
-    chklstPaths: TCheckListBox;
-    Label1: TLabel;
-    chkLstUnits: TCheckListBox;
-    Label2: TLabel;
-    pmPaths: TPopupMenu;
-    SelectAll1: TMenuItem;
-    UnselectAll1: TMenuItem;
-    pmUnits: TPopupMenu;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
-    RemovePath1: TMenuItem;
-    N1: TMenuItem;
-    N2: TMenuItem;
-    ChgeckUnits1: TMenuItem;
     edtOutputReport: TLabeledEdit;
     btnOutputReport: TButton;
     openTextDialog: TOpenTextFileDialog;
@@ -57,6 +48,7 @@ type
     chkUseRelativePath: TCheckBox;
     tsTreeView: TTabSheet;
     tvPaths: TTreeView;
+    iltreeView: TImageList;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnPreviousClick(Sender: TObject);
@@ -64,14 +56,9 @@ type
     procedure btnSelectExeNameClick(Sender: TObject);
     procedure btnSelectCodeCoverageClick(Sender: TObject);
     procedure btnSelectMapFileClick(Sender: TObject);
-    procedure SelectAll1Click(Sender: TObject);
-    procedure UnselectAll1Click(Sender: TObject);
-    procedure MenuItem1Click(Sender: TObject);
-    procedure MenuItem2Click(Sender: TObject);
-    procedure RemovePath1Click(Sender: TObject);
     procedure btnOutputReportClick(Sender: TObject);
     procedure btnFinishClick(Sender: TObject);
-    procedure tvPathsClick(Sender: TObject);
+    procedure tvPathsDblClick(Sender: TObject);
   private
     FProject: ICCEProject;
     FTreeNodes: TDictionary<String, TTreeNode>;
@@ -79,19 +66,17 @@ type
     function GetNode(APath: String): TTreeNode;
     procedure AddPathInTreeView(APath: String);
 
-    procedure OnRemoveUnit(AUnit: String);
-    procedure OnRemovePath(APath: String);
-    procedure OnAddUnit(AUnit: String);
-    procedure OnAddPath(APath: String);
+    procedure RefreshAll;
+
+    procedure CheckTreeView;
+    procedure CheckChilds (ANode: TTreeNode; AIndex: Integer);
+    procedure CheckParents(ANode: TTreeNode);
 
     procedure searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);
     procedure selectFolder(AComponent: TCustomEdit);
 
     procedure ListPaths;
     procedure ListUnits(Path: String);
-
-    procedure SelectAllPaths;
-    procedure SelectAllUnits;
 
     procedure InitialValues;
     procedure ApplyTheme;
@@ -116,53 +101,48 @@ implementation
 procedure TCCEWizardForms.AddPathInTreeView(APath: String);
 var
   i: Integer;
-  list: TStringList;
   nodeParent: TTreeNode;
   node: TTreeNode;
   text: String;
   pathParent: String;
   path: String;
+  splittedPath: TArray<string>;
 begin
-  list := TStringList.Create;
-  try
-    list.Delimiter := '\';
-    list.StrictDelimiter := True;
-    list.DelimitedText := APath;
+  splittedPath := APath.Split(['\']);
 
-    nodeParent := nil;
-    pathParent := '';
-    for i := 0 to Pred(list.Count) do
+  nodeParent := nil;
+  pathParent := '';
+  for i := 0 to Pred(Length(splittedPath)) do
+  begin
+    text := splittedPath[i];
+    if text = '' then
+      Continue;
+    path := path + text + '\';
+    node := GetNode(path);
+    if Assigned(node) then
+      Continue;
+
+    if i = 0 then
     begin
-      text := list[i];
-      if text = '' then
-        Continue;
-      path := path + text + '\';
-      node := GetNode(path);
-      if Assigned(node) then
-        Continue;
-
-      if i = 0 then
-      begin
-        nodeParent := tvPaths.Items.AddChild(nil, text);
-//        nodeParent.
-        FTreeNodes.Add(path, nodeParent);
-        nodeParent := nil;
-        Continue;
-      end;
-
-      pathParent := Copy(path, 1, path.length - text.Length - 1);
-      nodeParent := GetNode(pathParent);
-      if Assigned(nodeParent) then
-      begin
-        nodeParent := tvPaths.Items.AddChild(nodeParent, text);
-        FTreeNodes.Add(path, nodeParent);
-        nodeParent := nil;
-        Continue;
-      end;
+      nodeParent := tvPaths.Items.AddChild(nil, text);
+      nodeParent.ImageIndex := CHECKED_INDEX;
+      nodeParent.SelectedIndex := CHECKED_INDEX;
+      FTreeNodes.Add(path, nodeParent);
+      nodeParent := nil;
+      Continue;
     end;
 
-  finally
-    list.Free;
+    pathParent := Copy(path, 1, path.length - text.Length - 1);
+    nodeParent := GetNode(pathParent);
+    if Assigned(nodeParent) then
+    begin
+      nodeParent := tvPaths.Items.AddChild(nodeParent, text);
+      nodeParent.ImageIndex := CHECKED_INDEX;
+      nodeParent.SelectedIndex := CHECKED_INDEX;
+      FTreeNodes.Add(path, nodeParent);
+      nodeParent := nil;
+      Continue;
+    end;
   end;
 end;
 
@@ -184,11 +164,17 @@ begin
 //
 //    if Components[i] is TComboBox then
 //      theme.ApplyTheme(TComboBox(Components[i]));
-//    if Components[i] is TPageControl then
-//      theme.ApplyTheme(TPageControl(Components[i]));
-//
-//    if Components[i] is TTabSheet then
-//      theme.ApplyTheme(TTabSheet(Components[i]));
+    if Components[i] is TPageControl then
+    begin
+      theme.ApplyTheme(TPageControl(Components[i]));
+      TPageControl(Components[i]).Repaint;
+    end;
+
+    if Components[i] is TTabSheet then
+    begin
+      theme.ApplyTheme(TTabSheet(Components[i]));
+      TTabSheet(Components[i]).Repaint;
+    end;
 
     if Components[i] is TPanel then
       theme.ApplyTheme(TPanel(Components[i]));
@@ -196,6 +182,8 @@ begin
     if Components[i] is TLabeledEdit then
       theme.ApplyTheme(TLabeledEdit(Components[i]));
 
+    if Components[i] is TWinControl then
+      theme.ApplyTheme(TWinControl(Components[i]));
   end;
 //    theme.StyleServices.
   {$ENDIF}
@@ -219,6 +207,64 @@ end;
 procedure TCCEWizardForms.btnSelectMapFileClick(Sender: TObject);
 begin
   searchFile('Map File', 'map', edtMapFileName);
+end;
+
+procedure TCCEWizardForms.CheckChilds(ANode: TTreeNode; AIndex: Integer);
+var
+  i: Integer;
+  childNode: TTreeNode;
+begin
+  childNode := ANode.getFirstChild;
+
+  while childNode <> nil do
+  begin
+    childNode.ImageIndex := AIndex;
+    childNode.SelectedIndex := AIndex;
+    CheckChilds(childNode, AIndex);
+
+    childNode := ANode.GetNextChild(childNode);
+  end;
+end;
+
+procedure TCCEWizardForms.CheckParents(ANode: TTreeNode);
+var
+  nodeParent: TTreeNode;
+  hasCheck: Boolean;
+  hasUnCheck: Boolean;
+  hasGrayed: Boolean;
+  i: Integer;
+  childNode: TTreeNode;
+  index: Integer;
+begin
+  nodeParent := ANode.Parent;
+  if not Assigned(nodeParent) then
+    Exit;
+
+  hasCheck := False;
+  hasUnCheck := False;
+  hasGrayed := False;
+
+  childNode := nodeParent.getFirstChild;
+  while childNode <> nil do
+  begin
+    index := childNode.ImageIndex;
+    hasCheck := (hasCheck) or (index = CHECKED_INDEX);
+    hasUnCheck := (hasUnCheck) or (index = UNCHECKED_INDEX);
+    hasGrayed := (hasGrayed) or (index = GRAYED_INDEX);
+
+    childNode := nodeParent.GetNextChild(childNode);
+  end;
+
+  index := UNCHECKED_INDEX;
+  if (hasCheck and hasUnCheck) or (hasGrayed) then
+    index := GRAYED_INDEX
+  else
+  if hasCheck then
+    index := CHECKED_INDEX;
+
+  nodeParent.ImageIndex := index;
+  nodeParent.SelectedIndex := index;
+  CheckParents(nodeParent);
 end;
 
 procedure TCCEWizardForms.btnFinishClick(Sender: TObject);
@@ -248,16 +294,28 @@ begin
   selectFolder(edtOutputReport);
 end;
 
+procedure TCCEWizardForms.checkTreeView;
+var
+  imageIndex: Integer;
+  nodeSelected: TTreeNode;
+begin
+  nodeSelected := tvPaths.Selected;
+  imageIndex := UNCHECKED_INDEX;
+  if nodeSelected.ImageIndex = UNCHECKED_INDEX then
+    imageIndex := CHECKED_INDEX;
+
+  nodeSelected.ImageIndex := imageIndex;
+  nodeSelected.SelectedIndex := imageIndex;
+
+  CheckChilds(nodeSelected, imageIndex);
+  CheckParents(nodeSelected);
+end;
+
 constructor TCCEWizardForms.create(AOwner: TComponent; Project: IOTAProject);
 begin
   inherited create(AOwner);
   FTreeNodes := TDictionary<String, TTreeNode>.create;
   FProject := TCCECoreProject.New(Project);
-  FProject
-    .OnAddUnit(Self.OnAddUnit)
-    .OnAddPath(Self.OnAddPath)
-    .OnRemoveUnit(Self.OnRemoveUnit)
-    .OnRemovePath(Self.OnRemovePath);
 end;
 
 destructor TCCEWizardForms.Destroy;
@@ -302,8 +360,6 @@ begin
 //  edtMapFileName.Text := FProject.MapFileName;
 
   ListPaths;
-  SelectAllPaths;
-  SelectAllUnits;
 end;
 
 procedure TCCEWizardForms.ListPaths;
@@ -313,20 +369,11 @@ var
 begin
   paths := FProject.ListAllPaths;
 
-  {$REGION 'CheckList'}
   for i := 0 to Pred(Length(paths)) do
     if TDirectory.Exists(paths[i]) then
     begin
-      chklstPaths.AddOrSet(paths[i]);
-
       ListUnits(Paths[i]);
     end;
-  {$ENDREGION}
-
-  for i := 0 to Pred(Length(paths)) do
-    if TDirectory.Exists(paths[i]) then
-      AddPathInTreeView(Paths[i]);
-
 end;
 
 procedure TCCEWizardForms.ListUnits(Path: String);
@@ -336,47 +383,13 @@ var
 begin
   units := FProject.ListAllUnits(Path);
   for i := 0 to Pred(Length( units )) do
-    chkLstUnits.AddOrSet(units[i]);
+    AddPathInTreeView(units[i]);
+
 end;
 
-procedure TCCEWizardForms.MenuItem1Click(Sender: TObject);
+procedure TCCEWizardForms.RefreshAll;
 begin
-  chkLstUnits.SelectAll;
-end;
-
-procedure TCCEWizardForms.MenuItem2Click(Sender: TObject);
-begin
-  chkLstUnits.UnSelectAll;
-end;
-
-procedure TCCEWizardForms.OnAddPath(APath: String);
-begin
-  chklstPaths.Check(APath);
-end;
-
-procedure TCCEWizardForms.OnAddUnit(AUnit: String);
-begin
-  chkLstUnits.Check(AUnit);
-end;
-
-procedure TCCEWizardForms.OnRemovePath(APath: String);
-begin
-  chklstPaths.UnCheck(APath);
-end;
-
-procedure TCCEWizardForms.OnRemoveUnit(AUnit: String);
-begin
-  chkLstUnits.UnCheck(AUnit);
-end;
-
-procedure TCCEWizardForms.RemovePath1Click(Sender: TObject);
-var
-  path: String;
-begin
-  path := chklstPaths.Value;
-  FProject.RemoveAllUnits(path);
-  FProject.RemovePath(path);
-
+//  FProject.re
 end;
 
 procedure TCCEWizardForms.searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);
@@ -384,29 +397,6 @@ begin
   openTextDialog.Filter := Format('%s | *.%s', [FilterText, FilterExt]);
   if openTextDialog.Execute then
     AComponent.Text := openTextDialog.FileName;
-end;
-
-procedure TCCEWizardForms.SelectAll1Click(Sender: TObject);
-begin
-  SelectAllPaths;
-end;
-
-procedure TCCEWizardForms.SelectAllPaths;
-var
-  i: Integer;
-begin
-  chklstPaths.SelectAll;
-  for i := 0 to chklstPaths.Items.Count - 1 do
-    FProject.AddPath(chklstPaths.Value(i));
-end;
-
-procedure TCCEWizardForms.SelectAllUnits;
-var
-  i: Integer;
-begin
-  chkLstUnits.SelectAll;
-  for i := 0 to chkLstUnits.Items.Count - 1 do
-    FProject.AddUnit(chkLstUnits.Value(i));
 end;
 
 procedure TCCEWizardForms.selectFolder(AComponent: TCustomEdit);
@@ -432,14 +422,9 @@ begin
   btnNext.Enabled := True;
 end;
 
-procedure TCCEWizardForms.tvPathsClick(Sender: TObject);
+procedure TCCEWizardForms.tvPathsDblClick(Sender: TObject);
 begin
-  showmessage(tvPaths.SelectedPath);
-end;
-
-procedure TCCEWizardForms.UnselectAll1Click(Sender: TObject);
-begin
-  chklstPaths.UnSelectAll;
+  CheckTreeView;
 end;
 
 end.
