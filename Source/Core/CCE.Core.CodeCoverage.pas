@@ -291,6 +291,7 @@ end;
 
 function TCCECoreCodeCoverage.Save: ICCECodeCoverage;
 begin
+  Result := Self;
   GenerateFilePaths;
   GenerateFileUnits;
 

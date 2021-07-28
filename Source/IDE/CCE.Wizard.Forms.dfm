@@ -190,66 +190,66 @@ object CCEWizardForms: TCCEWizardForms
       Caption = 'TabSheet1'
       ImageIndex = 2
       object btnBuild: TButton
-        Left = 314
-        Top = 16
+        Left = 162
+        Top = 149
         Width = 139
         Height = 57
         Caption = 'Build Project'
-        TabOrder = 0
+        TabOrder = 3
         OnClick = btnBuildClick
       end
       object btnSetDetailed: TButton
-        Left = 163
-        Top = 16
+        Left = 11
+        Top = 149
         Width = 139
         Height = 57
         Caption = 'Set Detailed'
-        TabOrder = 1
+        TabOrder = 2
         OnClick = btnSetDetailedClick
       end
       object btnSave: TButton
-        Left = 11
-        Top = 16
+        Left = 162
+        Top = 7
         Width = 139
         Height = 57
         Caption = 'Generate Scripts'
-        TabOrder = 2
+        TabOrder = 1
         OnClick = btnSaveClick
       end
       object btnShowHTML: TButton
         Left = 11
-        Top = 104
+        Top = 312
         Width = 139
         Height = 57
         Caption = 'HTML Summary'
-        TabOrder = 3
+        TabOrder = 4
         OnClick = btnShowHTMLClick
       end
       object btnShowXML: TButton
-        Left = 163
-        Top = 104
+        Left = 162
+        Top = 312
         Width = 139
         Height = 57
         Caption = 'XML Summary'
-        TabOrder = 4
+        TabOrder = 5
         OnClick = btnShowXMLClick
       end
       object btnShowLog: TButton
         Left = 314
-        Top = 104
+        Top = 312
         Width = 139
         Height = 57
         Caption = 'Log'
-        TabOrder = 5
+        TabOrder = 6
         OnClick = btnShowLogClick
       end
       object btnRun: TButton
-        Left = 466
-        Top = 16
+        Left = 11
+        Top = 7
         Width = 139
         Height = 57
         Caption = 'Run'
-        TabOrder = 6
+        TabOrder = 0
         OnClick = btnRunClick
       end
     end
@@ -287,6 +287,7 @@ object CCEWizardForms: TCCEWizardForms
       Height = 25
       Caption = 'Close'
       TabOrder = 2
+      OnClick = btnCloseClick
     end
   end
   object pnlTop: TPanel

@@ -119,11 +119,8 @@ begin
 end;
 
 procedure TCCEHelperTreeView.ExpandAll;
-var
-  i: Integer;
 begin
-  for i := 0 to Pred(Items.Count) do
-    Items[i].Expand(True);
+  Self.FullExpand;
 end;
 
 function TCCEHelperTreeView.FindNode(ACaption: String; ALevel: Integer; ANodeParent: TTreeNode): TTreeNode;

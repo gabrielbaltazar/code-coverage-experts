@@ -68,6 +68,7 @@ type
     procedure btnShowXMLClick(Sender: TObject);
     procedure btnShowLogClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
+    procedure btnCloseClick(Sender: TObject);
   private
     FProject: ICCEProject;
     FCoverage: ICCECodeCoverage;
@@ -207,13 +208,16 @@ end;
 procedure TCCEWizardForms.btnRunClick(Sender: TObject);
 begin
   SetCoverage;
-  FCoverage.Execute;
+  FCoverage
+    .Save
+    .Execute;
 end;
 
 procedure TCCEWizardForms.btnSaveClick(Sender: TObject);
 begin
   SetCoverage;
   FCoverage.Save;
+  ShowMessage('OK');
 end;
 
 procedure TCCEWizardForms.btnSelectCodeCoverageClick(Sender: TObject);
@@ -234,6 +238,7 @@ end;
 procedure TCCEWizardForms.btnSetDetailedClick(Sender: TObject);
 begin
   FProject.SetDetailedMapFile;
+  ShowMessage('OK');
 end;
 
 procedure TCCEWizardForms.btnShowHTMLClick(Sender: TObject);
@@ -315,6 +320,11 @@ begin
   FProject.Build;
 end;
 
+procedure TCCEWizardForms.btnCloseClick(Sender: TObject);
+begin
+  ModalResult := mrClose;
+end;
+
 procedure TCCEWizardForms.btnNextClick(Sender: TObject);
 begin
   SelectPageNext;
@@ -360,6 +370,7 @@ procedure TCCEWizardForms.FormCreate(Sender: TObject);
 begin
   HideTabs;
   InitialValues;
+  tvPaths.ExpandAll;
 end;
 
 procedure TCCEWizardForms.FormShow(Sender: TObject);
