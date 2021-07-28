@@ -6,7 +6,10 @@ uses
   CCE.Core.Interfaces,
   CCE.Core.Utils,
   System.SysUtils,
-  System.Classes;
+  System.Classes,
+  Winapi.ShellAPI,
+  Winapi.Windows,
+  Vcl.Dialogs;
 
 type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
 
@@ -38,6 +41,9 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function GetOutputReport: string;
     function GetFileUnits: String;
     function GetFilePaths: string;
+    function GetReportHTMLName: String;
+    function GetReportXMLName: String;
+    function GetCoverageLogFileName: string;
   protected
     function CodeCoverageFileName(Value: String): ICCECodeCoverage;
     function ExeFileName(Value: String): ICCECodeCoverage;
@@ -53,6 +59,10 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
 
     function Save: ICCECodeCoverage;
     function Execute: ICCECodeCoverage;
+
+    function ShowHTMLReport: ICCECodeCoverage;
+    function ShowXMLReport: ICCECodeCoverage;
+    function ShowLogCoverage: ICCECodeCoverage;
 
   public
     constructor create;
@@ -107,8 +117,14 @@ end;
 function TCCECoreCodeCoverage.Execute: ICCECodeCoverage;
 begin
   result := Self;
-  GenerateFilePaths;
-  GenerateFileUnits;
+  Save;
+
+//  Winexec(PAnsiChar(FileCodeCoverageBat), SW_NORMAL);
+  WinExec(PAnsiChar('C:\WINDOWS\Command.COM /C ' + FileCodeCoverageBat),SW_SHOW);
+//  ShellExecute(HInstance, 'open', PChar(GetReportHTMLName), '', '', 0);
+//  ShowMessage('foi');
+
+
 end;
 
 function TCCECoreCodeCoverage.ExeFileName(Value: String): ICCECodeCoverage;
@@ -199,6 +215,11 @@ begin
   FGenerateXml := Value;
 end;
 
+function TCCECoreCodeCoverage.GetCoverageLogFileName: string;
+begin
+  result := BasePath + '\Delphi-Code-Coverage-Debug.log';
+end;
+
 function TCCECoreCodeCoverage.GetExeName: String;
 begin
   result := FExeFileName;
@@ -232,6 +253,16 @@ begin
   result := FOutputReport;
   if FUseRelativePath then
     result := AbsolutePathToRelative(FOutputReport, BasePath);
+end;
+
+function TCCECoreCodeCoverage.GetReportHTMLName: String;
+begin
+  result := FOutputReport + '\CodeCoverage_summary.html';
+end;
+
+function TCCECoreCodeCoverage.GetReportXMLName: String;
+begin
+  result := FOutputReport + '\CodeCoverage_Summary.xml';
 end;
 
 function TCCECoreCodeCoverage.MapFileName(Value: String): ICCECodeCoverage;
@@ -269,6 +300,24 @@ begin
   finally
     Free;
   end;
+end;
+
+function TCCECoreCodeCoverage.ShowHTMLReport: ICCECodeCoverage;
+begin
+  result := Self;
+  CCE.Core.Utils.OpenFile(GetReportHTMLName);
+end;
+
+function TCCECoreCodeCoverage.ShowLogCoverage: ICCECodeCoverage;
+begin
+  result := Self;
+  CCE.Core.Utils.OpenFile(GetCoverageLogFileName);
+end;
+
+function TCCECoreCodeCoverage.ShowXMLReport: ICCECodeCoverage;
+begin
+  result := Self;
+  CCE.Core.Utils.OpenFile(GetReportXMLName);
 end;
 
 function TCCECoreCodeCoverage.Units(Values: TArray<String>): ICCECodeCoverage;

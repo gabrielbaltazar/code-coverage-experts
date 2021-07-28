@@ -21,7 +21,7 @@ object CCEWizardForms: TCCEWizardForms
     Top = 41
     Width = 904
     Height = 452
-    ActivePage = tsFiles
+    ActivePage = TabSheet1
     Align = alClient
     TabOrder = 0
     object tsFiles: TTabSheet
@@ -163,15 +163,17 @@ object CCEWizardForms: TCCEWizardForms
     object tsTreeView: TTabSheet
       Caption = 'tsTreeView'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object tvPaths: TTreeView
-        Left = 3
-        Top = 16
-        Width = 870
-        Height = 345
+        AlignWithMargins = True
+        Left = 10
+        Top = 10
+        Width = 876
+        Height = 404
+        Margins.Left = 10
+        Margins.Top = 10
+        Margins.Right = 10
+        Margins.Bottom = 10
+        Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -182,6 +184,64 @@ object CCEWizardForms: TCCEWizardForms
         ParentFont = False
         TabOrder = 0
         OnDblClick = tvPathsDblClick
+      end
+    end
+    object TabSheet1: TTabSheet
+      Caption = 'TabSheet1'
+      ImageIndex = 2
+      object btnBuild: TButton
+        Left = 314
+        Top = 16
+        Width = 139
+        Height = 57
+        Caption = 'Build Project'
+        TabOrder = 0
+        OnClick = btnBuildClick
+      end
+      object btnSetDetailed: TButton
+        Left = 163
+        Top = 16
+        Width = 139
+        Height = 57
+        Caption = 'Set Detailed'
+        TabOrder = 1
+        OnClick = btnSetDetailedClick
+      end
+      object btnSave: TButton
+        Left = 11
+        Top = 16
+        Width = 139
+        Height = 57
+        Caption = 'Generate Scripts'
+        TabOrder = 2
+        OnClick = btnSaveClick
+      end
+      object btnShowHTML: TButton
+        Left = 11
+        Top = 104
+        Width = 139
+        Height = 57
+        Caption = 'HTML Summary'
+        TabOrder = 3
+        OnClick = btnShowHTMLClick
+      end
+      object btnShowXML: TButton
+        Left = 163
+        Top = 104
+        Width = 139
+        Height = 57
+        Caption = 'XML Summary'
+        TabOrder = 4
+        OnClick = btnShowXMLClick
+      end
+      object btnShowLog: TButton
+        Left = 314
+        Top = 104
+        Width = 139
+        Height = 57
+        Caption = 'Log'
+        TabOrder = 5
+        OnClick = btnShowLogClick
       end
     end
   end
@@ -218,7 +278,6 @@ object CCEWizardForms: TCCEWizardForms
       Height = 25
       Caption = 'Finish'
       TabOrder = 2
-      OnClick = btnFinishClick
     end
   end
   object pnlTop: TPanel

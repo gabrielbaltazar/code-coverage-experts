@@ -31,17 +31,19 @@ type TCCECoreProject = class(TInterfacedObject, ICCEProject)
     function ExeName: String;
     function MapFileName: string;
 
+    function SetDetailedMapFile: ICCEProject;
+
     function ListAllPaths: TArray<String>;
     function ListAllUnits(Path: String): TArray<String>; overload;
     function ListAllUnits: TArray<String>; overload;
 
     function AddPath(Value: string): ICCEProject;
     function AddUnit(Value: string): ICCEProject;
-    function AddAllUnits(Path: string): ICCEProject;
 
     function RemovePath(Value: String): ICCEProject;
     function RemoveUnit(Value: String): ICCEProject;
-    function RemoveAllUnits(Path: String): ICCEProject;
+
+    function Build: ICCEProject;
 
     constructor create(Project: IOTAProject);
     class function New(Project: IOTAProject): ICCEProject;
@@ -51,17 +53,6 @@ end;
 implementation
 
 { TCCECoreProject }
-
-function TCCECoreProject.AddAllUnits(Path: string): ICCEProject;
-var
-  units: TArray<String>;
-  i: Integer;
-begin
-  result := Self;
-  units := ListAllUnits(Path);
-  for i := 0 to Pred(Length(units)) do
-    AddUnit(units[i]);
-end;
 
 function TCCECoreProject.AddPath(Value: string): ICCEProject;
 begin
@@ -75,6 +66,13 @@ begin
   result := Self;
   if not FSelectedUnits.Contains(Value) then
     FSelectedUnits.Add(Value);
+end;
+
+function TCCECoreProject.Build: ICCEProject;
+begin
+  result := Self;
+  FProject.ProjectBuilder
+    .BuildProject(TOTACompileMode.cmOTABuild, True, True);
 end;
 
 function TCCECoreProject.Clear: ICCEProject;
@@ -191,20 +189,6 @@ begin
   result := ExtractFilePath(FProject.FileName);
 end;
 
-function TCCECoreProject.RemoveAllUnits(Path: String): ICCEProject;
-var
-  i: Integer;
-  unitPath: string;
-begin
-  result := Self;
-  for i := Pred(FSelectedUnits.Count) downto 0 do
-  begin
-    unitPath := ExtractFilePath(FSelectedUnits[i]);
-    if Path.ToLower = unitPath.ToLower then
-      RemoveUnit(FSelectedUnits[i]);
-  end;
-end;
-
 function TCCECoreProject.RemovePath(Value: String): ICCEProject;
 begin
   result := Self;
@@ -242,6 +226,14 @@ begin
   finally
     searchPath.Free;
   end;
+end;
+
+function TCCECoreProject.SetDetailedMapFile: ICCEProject;
+begin
+  result := Self;
+  FActiveConfig.SetValue('DCC_MapFile', '3');
+  FProject.Save(False, True);
+  FProject.Refresh(True);
 end;
 
 end.

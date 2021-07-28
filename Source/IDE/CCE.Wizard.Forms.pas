@@ -44,6 +44,13 @@ type
     tsTreeView: TTabSheet;
     tvPaths: TTreeView;
     iltreeView: TImageList;
+    TabSheet1: TTabSheet;
+    btnBuild: TButton;
+    btnSetDetailed: TButton;
+    btnSave: TButton;
+    btnShowHTML: TButton;
+    btnShowXML: TButton;
+    btnShowLog: TButton;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnPreviousClick(Sender: TObject);
@@ -52,10 +59,16 @@ type
     procedure btnSelectCodeCoverageClick(Sender: TObject);
     procedure btnSelectMapFileClick(Sender: TObject);
     procedure btnOutputReportClick(Sender: TObject);
-    procedure btnFinishClick(Sender: TObject);
     procedure tvPathsDblClick(Sender: TObject);
+    procedure btnSaveClick(Sender: TObject);
+    procedure btnSetDetailedClick(Sender: TObject);
+    procedure btnBuildClick(Sender: TObject);
+    procedure btnShowHTMLClick(Sender: TObject);
+    procedure btnShowXMLClick(Sender: TObject);
+    procedure btnShowLogClick(Sender: TObject);
   private
     FProject: ICCEProject;
+    FCoverage: ICCECodeCoverage;
     FTreeNodes: TDictionary<String, TTreeNode>;
 
     function GetNode(APath: String): TTreeNode;
@@ -63,6 +76,8 @@ type
     function GetKeyNode(ANode: TTreeNode): String;
 
     procedure RefreshAll;
+
+    procedure SetCoverage;
 
     procedure CheckTreeView;
     procedure CheckChilds (ANode: TTreeNode; AIndex: Integer);
@@ -187,6 +202,12 @@ begin
   SelectPagePrevious;
 end;
 
+procedure TCCEWizardForms.btnSaveClick(Sender: TObject);
+begin
+  SetCoverage;
+  FCoverage.Execute;
+end;
+
 procedure TCCEWizardForms.btnSelectCodeCoverageClick(Sender: TObject);
 begin
   searchFile('Code Coverage File', 'exe', edtCoverageExeName);
@@ -200,6 +221,29 @@ end;
 procedure TCCEWizardForms.btnSelectMapFileClick(Sender: TObject);
 begin
   searchFile('Map File', 'map', edtMapFileName);
+end;
+
+procedure TCCEWizardForms.btnSetDetailedClick(Sender: TObject);
+begin
+  FProject.SetDetailedMapFile;
+end;
+
+procedure TCCEWizardForms.btnShowHTMLClick(Sender: TObject);
+begin
+  SetCoverage;
+  FCoverage.ShowHTMLReport;
+end;
+
+procedure TCCEWizardForms.btnShowLogClick(Sender: TObject);
+begin
+  SetCoverage;
+  FCoverage.ShowLogCoverage;
+end;
+
+procedure TCCEWizardForms.btnShowXMLClick(Sender: TObject);
+begin
+  SetCoverage;
+  FCoverage.ShowXMLReport;
 end;
 
 procedure TCCEWizardForms.CheckChilds(ANode: TTreeNode; AIndex: Integer);
@@ -258,23 +302,9 @@ begin
   CheckParents(nodeParent);
 end;
 
-procedure TCCEWizardForms.btnFinishClick(Sender: TObject);
+procedure TCCEWizardForms.btnBuildClick(Sender: TObject);
 begin
-  RefreshAll;
-
-  TCCECoreCodeCoverage.New
-    .CodeCoverageFileName(edtCoverageExeName.Text)
-    .ExeFileName(edtExeName.Text)
-    .MapFileName(edtMapFileName.Text)
-    .OutputReport(edtOutputReport.Text)
-    .Paths(FProject.ListAllPaths)
-    .Units(FProject.ListAllUnits)
-    .GenerateHtml(chkHtmlReport.Checked)
-    .GenerateXml(chkXmlReport.Checked)
-    .GenerateEmma(chkEmmaReport.Checked)
-    .GenerateLog(chkLog.Checked)
-    .UseRelativePath(chkUseRelativePath.Checked)
-    .Save;
+  FProject.Build;
 end;
 
 procedure TCCEWizardForms.btnNextClick(Sender: TObject);
@@ -309,6 +339,7 @@ begin
   inherited create(AOwner);
   FTreeNodes := TDictionary<String, TTreeNode>.create;
   FProject := TCCECoreProject.New(Project);
+  FCoverage := TCCECoreCodeCoverage.New;
 end;
 
 destructor TCCEWizardForms.Destroy;
@@ -447,6 +478,25 @@ begin
   pgcWizard.SelectNextPage(False, False);
   btnPrevious.Enabled := pgcWizard.ActivePageIndex > 0;
   btnNext.Enabled := True;
+end;
+
+procedure TCCEWizardForms.SetCoverage;
+begin
+  RefreshAll;
+
+  FCoverage
+    .CodeCoverageFileName(edtCoverageExeName.Text)
+    .ExeFileName(edtExeName.Text)
+    .MapFileName(edtMapFileName.Text)
+    .OutputReport(edtOutputReport.Text)
+    .Paths(FProject.ListAllPaths)
+    .Units(FProject.ListAllUnits)
+    .GenerateHtml(chkHtmlReport.Checked)
+    .GenerateXml(chkXmlReport.Checked)
+    .GenerateEmma(chkEmmaReport.Checked)
+    .GenerateLog(chkLog.Checked)
+    .UseRelativePath(chkUseRelativePath.Checked)
+    .Execute;
 end;
 
 procedure TCCEWizardForms.tvPathsDblClick(Sender: TObject);

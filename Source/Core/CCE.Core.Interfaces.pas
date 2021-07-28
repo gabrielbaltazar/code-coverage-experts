@@ -15,17 +15,19 @@ type
     function ExeName: String; overload;
     function MapFileName: string; overload;
 
+    function SetDetailedMapFile: ICCEProject;
+
     function ListAllPaths: TArray<String>;
     function ListAllUnits(Path: String): TArray<String>; overload;
     function ListAllUnits: TArray<String>; overload;
 
     function AddPath(Value: string): ICCEProject;
     function AddUnit(Value: string): ICCEProject;
-    function AddAllUnits(Value: string): ICCEProject;
 
     function RemovePath(Value: String): ICCEProject;
     function RemoveUnit(Value: String): ICCEProject;
-    function RemoveAllUnits(Path: String): ICCEProject;
+
+    function Build: ICCEProject;
   end;
 
   ICCECodeCoverage = interface
@@ -44,6 +46,10 @@ type
 
     function Save: ICCECodeCoverage;
     function Execute: ICCECodeCoverage;
+
+    function ShowHTMLReport: ICCECodeCoverage;
+    function ShowXMLReport: ICCECodeCoverage;
+    function ShowLogCoverage: ICCECodeCoverage;
   end;
 
 implementation
