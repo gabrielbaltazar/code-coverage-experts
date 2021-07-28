@@ -4,6 +4,7 @@ interface
 
 uses
   CCE.Core.Interfaces,
+  CCE.Core.Utils,
   System.SysUtils,
   System.Classes;
 
@@ -27,8 +28,16 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function FileCodeCoverageBat: string;
     function CodeCoverageCommand: String;
 
+    function BasePath: string;
+
     procedure GenerateFilePaths;
     procedure GenerateFileUnits;
+
+    function GetExeName: String;
+    function GetMapName: String;
+    function GetOutputReport: string;
+    function GetFileUnits: String;
+    function GetFilePaths: string;
   protected
     function CodeCoverageFileName(Value: String): ICCECodeCoverage;
     function ExeFileName(Value: String): ICCECodeCoverage;
@@ -54,6 +63,11 @@ implementation
 
 { TCCECoreCodeCoverage }
 
+function TCCECoreCodeCoverage.BasePath: string;
+begin
+  result := ExtractFilePath(FExeFileName);
+end;
+
 function TCCECoreCodeCoverage.CodeCoverageCommand: String;
 begin
   result := '"%s" -e "%s" -m "%s" -uf "%s" -spf "%s" -od "%s" ';
@@ -67,11 +81,11 @@ begin
     result := result + '-xml';
 
   result := Format(Result, [FCodeCoverageFileName,
-                            FExeFileName,
-                            FMapFileName,
-                            FileUnitsName,
-                            FilePathsName,
-                            FOutputReport]);
+                            GetExeName,
+                            GetMapName,
+                            GetFileUnits,
+                            GetFilePaths,
+                            GetOutputReport]);
 end;
 
 function TCCECoreCodeCoverage.CodeCoverageFileName(Value: String): ICCECodeCoverage;
@@ -180,6 +194,41 @@ function TCCECoreCodeCoverage.GenerateXml(Value: Boolean): ICCECodeCoverage;
 begin
   result := Self;
   FGenerateXml := Value;
+end;
+
+function TCCECoreCodeCoverage.GetExeName: String;
+begin
+  result := FExeFileName;
+  if FUseRelativePath then
+    result := AbsolutePathToRelative(FExeFileName, BasePath);
+end;
+
+function TCCECoreCodeCoverage.GetFilePaths: string;
+begin
+  result := FilePathsName;
+  if FUseRelativePath then
+    result := AbsolutePathToRelative(FilePathsName, BasePath);
+end;
+
+function TCCECoreCodeCoverage.GetFileUnits: String;
+begin
+  result := FileUnitsName;
+  if FUseRelativePath then
+    result := AbsolutePathToRelative(FileUnitsName, BasePath);
+end;
+
+function TCCECoreCodeCoverage.GetMapName: String;
+begin
+  result := FMapFileName;
+  if FUseRelativePath then
+    result := AbsolutePathToRelative(FMapFileName, BasePath);
+end;
+
+function TCCECoreCodeCoverage.GetOutputReport: string;
+begin
+  result := FOutputReport;
+  if FUseRelativePath then
+    result := AbsolutePathToRelative(FOutputReport, BasePath);
 end;
 
 function TCCECoreCodeCoverage.MapFileName(Value: String): ICCECodeCoverage;

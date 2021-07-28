@@ -6,6 +6,7 @@ uses
   Dccstrs,
   ToolsAPI,
   CCE.Core.Interfaces,
+  CCE.Core.Utils,
   System.Generics.Collections,
   System.IOUtils,
   System.SysUtils,
@@ -19,16 +20,12 @@ type TCCECoreProject = class(TInterfacedObject, ICCEProject)
     FActiveConfig: IOTABuildConfiguration;
     FSelectedPaths: TList<String>;
     FSelectedUnits: TList<String>;
-    FOnAddUnit: TProc<String>;
-    FOnAddPath: TProc<String>;
-    FOnRemoveUnit: TProc<String>;
-    FOnRemovePath: TProc<String>;
 
     function ProjectPath: string;
     function GetSearchPaths: TList<String>;
 
-    function RelToAbs(const RelPath, BasePath: string): string;
   public
+    function Clear: ICCEProject;
     function OutputPath: string;
     function ExeName: String;
     function MapFileName: string;
@@ -45,22 +42,10 @@ type TCCECoreProject = class(TInterfacedObject, ICCEProject)
     function RemoveUnit(Value: String): ICCEProject;
     function RemoveAllUnits(Path: String): ICCEProject;
 
-    function OnRemoveUnit(Value: TProc<String>): ICCEProject;
-    function OnRemovePath(Value: TProc<String>): ICCEProject;
-
-    function OnAddUnit(Value: TProc<String>): ICCEProject;
-    function OnAddPath(Value: TProc<String>): ICCEProject;
-
     constructor create(Project: IOTAProject);
     class function New(Project: IOTAProject): ICCEProject;
     destructor Destroy; override;
 end;
-
-function PathCanonicalize(lpszDst: PChar; lpszSrc: PChar): LongBool; stdcall;
-  external 'shlwapi.dll' name 'PathCanonicalizeW';
-
-function PathRelativePathTo(pszPath: PChar; pszFrom: PChar; dwAttrFrom: DWORD;
-  pszTo: PChar; dwAtrTo: DWORD): LongBool; stdcall; external 'shlwapi.dll' name 'PathRelativePathToW';
 
 implementation
 
@@ -83,9 +68,6 @@ begin
   result := Self;
   if not FSelectedPaths.Contains(Value) then
     FSelectedPaths.Add(Value);
-
-  if Assigned(FOnAddPath) then
-    FOnAddPath(Value);
 end;
 
 function TCCECoreProject.AddUnit(Value: string): ICCEProject;
@@ -93,9 +75,18 @@ begin
   result := Self;
   if not FSelectedUnits.Contains(Value) then
     FSelectedUnits.Add(Value);
+end;
 
-  if Assigned(FOnAddUnit) then
-    FOnAddUnit(Value);
+function TCCECoreProject.Clear: ICCEProject;
+var
+  i: Integer;
+begin
+  result := Self;
+  for i := Pred(FSelectedPaths.Count) downto 0 do
+    RemovePath(FSelectedPaths[i]);
+
+  for i := Pred(FSelectedUnits.Count) downto 0 do
+    RemoveUnit(FSelectedUnits[i]);
 end;
 
 constructor TCCECoreProject.create(Project: IOTAProject);
@@ -134,7 +125,7 @@ begin
       FActiveConfig.GetValues(sUnitSearchPath, searchPath, True);
       for i := 0 to Pred(searchPath.Count) do
       begin
-        path := RelToAbs(searchPath[i], ProjectPath);
+        path := RelativeToAbsolutePath(searchPath[i], ProjectPath);
         result.Add(path);
       end;
 
@@ -215,34 +206,10 @@ begin
   result := Self.create(Project);
 end;
 
-function TCCECoreProject.OnAddPath(Value: TProc<String>): ICCEProject;
-begin
-  result := Self;
-  FOnAddPath := Value;
-end;
-
-function TCCECoreProject.OnAddUnit(Value: TProc<String>): ICCEProject;
-begin
-  result := Self;
-  FOnAddUnit := Value;
-end;
-
-function TCCECoreProject.OnRemovePath(Value: TProc<String>): ICCEProject;
-begin
-  result := Self;
-  FOnRemovePath := Value;
-end;
-
-function TCCECoreProject.OnRemoveUnit(Value: TProc<String>): ICCEProject;
-begin
-  result := Self;
-  FOnRemoveUnit := Value;
-end;
-
 function TCCECoreProject.OutputPath: string;
 begin
   result := FActiveConfig.GetValue(sExeOutput);
-  result := TPath.GetFullPath(result)
+  result := RelativeToAbsolutePath(Result, ProjectPath)
                  .Replace('$(Platform)', FActiveConfig.Platform)
                  .Replace('$(Config)', FActiveConfig.Name) + '\';
 
@@ -252,14 +219,6 @@ end;
 function TCCECoreProject.ProjectPath: string;
 begin
   result := ExtractFilePath(FProject.FileName);
-end;
-
-function TCCECoreProject.RelToAbs(const RelPath, BasePath: string): string;
-var
-  Dst: array[0..259] of char;
-begin
-  PathCanonicalize(@Dst[0], PChar(IncludeTrailingBackslash(BasePath) + RelPath));
-  result := Dst;
 end;
 
 function TCCECoreProject.RemoveAllUnits(Path: String): ICCEProject;
@@ -280,18 +239,12 @@ function TCCECoreProject.RemovePath(Value: String): ICCEProject;
 begin
   result := Self;
   FSelectedPaths.Remove(Value);
-
-  if Assigned(FOnRemovePath) then
-    FOnRemovePath(Value);
 end;
 
 function TCCECoreProject.RemoveUnit(Value: String): ICCEProject;
 begin
   result := Self;
   FSelectedUnits.Remove(Value);
-
-  if Assigned(FOnRemoveUnit) then
-    FOnRemoveUnit(Value);
 end;
 
 end.

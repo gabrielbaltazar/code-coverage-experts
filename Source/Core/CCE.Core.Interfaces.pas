@@ -9,6 +9,7 @@ uses
 type
   ICCEProject = interface
     ['{676756F9-BEBC-4FCB-90AE-0B9843F7D126}']
+    function Clear: ICCEProject;
     function ProjectPath: string;
     function OutputPath: string;
     function ExeName: String; overload;
@@ -25,12 +26,6 @@ type
     function RemovePath(Value: String): ICCEProject;
     function RemoveUnit(Value: String): ICCEProject;
     function RemoveAllUnits(Path: String): ICCEProject;
-
-    function OnRemoveUnit(Value: TProc<String>): ICCEProject;
-    function OnRemovePath(Value: TProc<String>): ICCEProject;
-
-    function OnAddUnit(Value: TProc<String>): ICCEProject;
-    function OnAddPath(Value: TProc<String>): ICCEProject;
   end;
 
   ICCECodeCoverage = interface

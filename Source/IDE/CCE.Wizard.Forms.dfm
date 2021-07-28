@@ -2,7 +2,7 @@ object CCEWizardForms: TCCEWizardForms
   Left = 0
   Top = 0
   BorderStyle = bsDialog
-  ClientHeight = 486
+  ClientHeight = 534
   ClientWidth = 904
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,16 +20,12 @@ object CCEWizardForms: TCCEWizardForms
     Left = 0
     Top = 41
     Width = 904
-    Height = 404
-    ActivePage = tsTreeView
+    Height = 452
+    ActivePage = tsFiles
     Align = alClient
     TabOrder = 0
     object tsFiles: TTabSheet
       Caption = 'Files'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object edtExeName: TLabeledEdit
         Left = 10
         Top = 79
@@ -39,9 +35,6 @@ object CCEWizardForms: TCCEWizardForms
         EditLabel.Height = 13
         EditLabel.Caption = 'Delphi Project'
         TabOrder = 2
-        Text = 
-          'D:\Desenvolvimento\workspace\Delphi\FormacaoDelphiSenior\Tests\P' +
-          'rojetoBase\Bin\FormacaoERPTest.exe'
       end
       object btnSelectExeName: TButton
         Left = 623
@@ -61,9 +54,6 @@ object CCEWizardForms: TCCEWizardForms
         EditLabel.Height = 13
         EditLabel.Caption = 'Map File Project'
         TabOrder = 4
-        Text = 
-          'D:\Desenvolvimento\workspace\Delphi\FormacaoDelphiSenior\Tests\P' +
-          'rojetoBase\Bin\FormacaoERPTest.map'
       end
       object btnSelectMapFile: TButton
         Left = 624
@@ -103,7 +93,6 @@ object CCEWizardForms: TCCEWizardForms
         EditLabel.Height = 13
         EditLabel.Caption = 'Output Report'
         TabOrder = 6
-        Text = '.\Report'
       end
       object btnOutputReport: TButton
         Left = 624
@@ -116,7 +105,7 @@ object CCEWizardForms: TCCEWizardForms
       end
       object grpOutputFormat: TGroupBox
         Left = 11
-        Top = 232
+        Top = 275
         Width = 606
         Height = 141
         Caption = 'Output'
@@ -194,7 +183,7 @@ object CCEWizardForms: TCCEWizardForms
   end
   object pnlBottom: TPanel
     Left = 0
-    Top = 445
+    Top = 493
     Width = 904
     Height = 41
     Align = alBottom
@@ -263,7 +252,7 @@ object CCEWizardForms: TCCEWizardForms
     Left = 687
     Top = 8
     Bitmap = {
-      494C010103000800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010103000800240010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000009D9D9D000F0F0F00000000000000
       0000000000000000000000000000000000000000000000000000000000000000

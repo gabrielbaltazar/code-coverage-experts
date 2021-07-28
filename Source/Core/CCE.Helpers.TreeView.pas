@@ -8,6 +8,11 @@ uses
   Vcl.ComCtrls,
   Vcl.Controls;
 
+const
+  UNCHECKED_INDEX = 0;
+  CHECKED_INDEX = 1;
+  GRAYED_INDEX = 2;
+
 type TCCEHelperTreeView = class helper for TTreeView
 
   public
@@ -16,6 +21,7 @@ type TCCEHelperTreeView = class helper for TTreeView
     function FindNode(ACaption: String; ALevel: Integer; ANodeParent: TTreeNode): TTreeNode;
 
     function SelectedPath: string;
+    function CheckedNodes: TArray<TTreeNode>;
 
     procedure ExpandAll;
 end;
@@ -96,6 +102,20 @@ begin
 
   finally
     list.Free;
+  end;
+end;
+
+function TCCEHelperTreeView.CheckedNodes: TArray<TTreeNode>;
+var
+  i: Integer;
+begin
+  for i := 0 to Pred(Items.Count) do
+  begin
+    if Items[i].ImageIndex = CHECKED_INDEX then
+    begin
+      SetLength(result, Length(result) + 1);
+      Result[Length(result) - 1] := Items[i];
+    end;
   end;
 end;
 

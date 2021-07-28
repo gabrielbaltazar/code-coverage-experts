@@ -16,11 +16,6 @@ uses
   System.Generics.Collections, Vcl.CheckLst, Vcl.Menus, Vcl.Buttons,
   System.ImageList, Vcl.ImgList;
 
-const
-  UNCHECKED_INDEX = 0;
-  CHECKED_INDEX = 1;
-  GRAYED_INDEX = 2;
-
 type
   TCCEWizardForms = class(TForm)
     pgcWizard: TPageControl;
@@ -65,6 +60,7 @@ type
 
     function GetNode(APath: String): TTreeNode;
     procedure AddPathInTreeView(APath: String);
+    function GetKeyNode(ANode: TTreeNode): String;
 
     procedure RefreshAll;
 
@@ -110,7 +106,6 @@ var
 begin
   splittedPath := APath.Split(['\']);
 
-  nodeParent := nil;
   pathParent := '';
   for i := 0 to Pred(Length(splittedPath)) do
   begin
@@ -128,7 +123,6 @@ begin
       nodeParent.ImageIndex := CHECKED_INDEX;
       nodeParent.SelectedIndex := CHECKED_INDEX;
       FTreeNodes.Add(path, nodeParent);
-      nodeParent := nil;
       Continue;
     end;
 
@@ -140,7 +134,6 @@ begin
       nodeParent.ImageIndex := CHECKED_INDEX;
       nodeParent.SelectedIndex := CHECKED_INDEX;
       FTreeNodes.Add(path, nodeParent);
-      nodeParent := nil;
       Continue;
     end;
   end;
@@ -211,7 +204,6 @@ end;
 
 procedure TCCEWizardForms.CheckChilds(ANode: TTreeNode; AIndex: Integer);
 var
-  i: Integer;
   childNode: TTreeNode;
 begin
   childNode := ANode.getFirstChild;
@@ -232,7 +224,6 @@ var
   hasCheck: Boolean;
   hasUnCheck: Boolean;
   hasGrayed: Boolean;
-  i: Integer;
   childNode: TTreeNode;
   index: Integer;
 begin
@@ -269,6 +260,8 @@ end;
 
 procedure TCCEWizardForms.btnFinishClick(Sender: TObject);
 begin
+  RefreshAll;
+
   TCCECoreCodeCoverage.New
     .CodeCoverageFileName(edtCoverageExeName.Text)
     .ExeFileName(edtExeName.Text)
@@ -335,6 +328,22 @@ begin
 //  ApplyTheme;
 end;
 
+function TCCEWizardForms.GetKeyNode(ANode: TTreeNode): String;
+var
+  nodeParent: TTreeNode;
+begin
+  result := ANode.Text;
+  nodeParent := ANode.Parent;
+  while nodeParent <> nil do
+  begin
+    result := nodeParent.Text + '\' + Result;
+    nodeParent := nodeParent.Parent;
+  end;
+
+  if result.EndsWith('\') then
+    result := Copy(Result, 1, result.Length - 1);
+end;
+
 function TCCEWizardForms.GetNode(APath: String): TTreeNode;
 begin
   result := nil;
@@ -356,8 +365,9 @@ end;
 
 procedure TCCEWizardForms.InitialValues;
 begin
-//  edtExeName.Text := FProject.ExeName;
-//  edtMapFileName.Text := FProject.MapFileName;
+  edtExeName.Text := FProject.ExeName;
+  edtMapFileName.Text := FProject.MapFileName;
+  edtOutputReport.Text := ExtractFilePath(FProject.ExeName) + 'report';
 
   ListPaths;
 end;
@@ -388,8 +398,25 @@ begin
 end;
 
 procedure TCCEWizardForms.RefreshAll;
+var
+  nodeSelect: TArray<TTreeNode>;
+  i: Integer;
+  unitFile: string;
 begin
-//  FProject.re
+  FProject.Clear;
+  nodeSelect := tvPaths.CheckedNodes;
+
+  for i := 0 to Pred(Length(nodeSelect)) do
+  begin
+    unitFile := GetKeyNode(nodeSelect[i]);
+    if FileExists(unitFile) then
+    begin
+      FProject
+        .AddUnit(unitFile)
+        .AddPath(ExtractFilePath(unitFile));
+    end;
+  end;
+
 end;
 
 procedure TCCEWizardForms.searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);
