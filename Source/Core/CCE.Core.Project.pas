@@ -24,6 +24,7 @@ type TCCECoreProject = class(TInterfacedObject, ICCEProject)
     function ProjectPath: string;
     function GetSearchPaths: TList<String>;
 
+    procedure SetAllPaths;
   public
     function Clear: ICCEProject;
     function OutputPath: string;
@@ -60,7 +61,6 @@ begin
   units := ListAllUnits(Path);
   for i := 0 to Pred(Length(units)) do
     AddUnit(units[i]);
-
 end;
 
 function TCCECoreProject.AddPath(Value: string): ICCEProject;
@@ -97,6 +97,8 @@ begin
 
   FSelectedPaths := TList<String>.create;
   FSelectedUnits := TList<String>.create;
+
+  SetAllPaths;
 end;
 
 destructor TCCECoreProject.Destroy;
@@ -138,40 +140,8 @@ begin
 end;
 
 function TCCECoreProject.ListAllPaths: TArray<String>;
-var
-  i: Integer;
-  paths: TList<String>;
-  searchPath: TList<String>;
-  path: string;
 begin
-  paths := TList<String>.create;
-  try
-    for i := 0 to Pred(FProject.GetModuleCount) do
-    begin
-      if ExtractFileExt(FProject.GetModule(i).FileName) = '.pas' then
-      begin
-        path := ExtractFilePath(FProject.GetModule(i).FileName);
-        if (not paths.Contains(path)) then
-          paths.Add(path);
-      end;
-    end;
-
-    searchPath := Self.GetSearchPaths;
-    try
-      for i := 0 to Pred(searchPath.Count) do
-      begin
-        path := searchPath.Items[i];
-        if (not paths.Contains(path)) then
-          paths.Add(path);
-      end;
-    finally
-      searchPath.Free;
-    end;
-
-    result := paths.ToArray;
-  finally
-    paths.Free;
-  end;
+  result := FSelectedPaths.ToArray;
 end;
 
 function TCCECoreProject.ListAllUnits: TArray<String>;
@@ -245,6 +215,33 @@ function TCCECoreProject.RemoveUnit(Value: String): ICCEProject;
 begin
   result := Self;
   FSelectedUnits.Remove(Value);
+end;
+
+procedure TCCECoreProject.SetAllPaths;
+var
+  i: Integer;
+  searchPath: TList<String>;
+  path: string;
+begin
+  for i := 0 to Pred(FProject.GetModuleCount) do
+  begin
+    if ExtractFileExt(FProject.GetModule(i).FileName) = '.pas' then
+    begin
+      path := ExtractFilePath(FProject.GetModule(i).FileName);
+      AddPath(path);
+    end;
+  end;
+
+  searchPath := Self.GetSearchPaths;
+  try
+    for i := 0 to Pred(searchPath.Count) do
+    begin
+      path := searchPath.Items[i];
+      AddPath(path);
+    end;
+  finally
+    searchPath.Free;
+  end;
 end;
 
 end.

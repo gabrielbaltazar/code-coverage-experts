@@ -148,6 +148,9 @@ begin
     for i := 0 to Pred(Length(FPaths)) do
     begin
       path := FPaths[i];
+      if FUseRelativePath then
+        path := AbsolutePathToRelative(path, BasePath);
+
       if not path.EndsWith('\') then
         path := path + '\';
       Add(path);
