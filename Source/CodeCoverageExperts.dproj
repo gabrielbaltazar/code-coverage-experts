@@ -113,7 +113,6 @@
         <DCCReference Include="IDE\CCE.Registry.pas"/>
         <DCCReference Include="Core\CCE.Core.Project.pas"/>
         <DCCReference Include="Core\CCE.Core.Interfaces.pas"/>
-        <DCCReference Include="Core\CCE.Helpers.CheckListBox.pas"/>
         <DCCReference Include="Core\CCE.Core.Utils.pas"/>
         <DCCReference Include="Core\CCE.Core.CodeCoverage.pas"/>
         <DCCReference Include="Core\CCE.Helpers.TreeView.pas"/>

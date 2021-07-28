@@ -11,7 +11,6 @@ uses
   CCE.Core.Interfaces,
   CCE.Core.Project,
   CCE.Core.CodeCoverage,
-  CCE.Helpers.CheckListBox,
   CCE.Helpers.TreeView,
   System.Generics.Collections, Vcl.CheckLst, Vcl.Menus, Vcl.Buttons,
   System.ImageList, Vcl.ImgList;
@@ -52,7 +51,6 @@ type
     btnShowXML: TButton;
     btnShowLog: TButton;
     btnRun: TButton;
-    procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnPreviousClick(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
@@ -93,7 +91,6 @@ type
     procedure ListUnits(Path: String);
 
     procedure InitialValues;
-    procedure ApplyTheme;
     procedure HideTabs;
     procedure SelectPageNext;
     procedure SelectPagePrevious;
@@ -155,49 +152,6 @@ begin
       Continue;
     end;
   end;
-end;
-
-procedure TCCEWizardForms.ApplyTheme;
-{$IF CompilerVersion > 31.0}
-var
-  theme: IOTAIDEThemingServices250;
-  i: Integer;
-{$ENDIF}
-begin
-  {$IF CompilerVersion > 31.0}
-  theme := (BorlandIDEServices as IOTAIDEThemingServices250);
-  theme.RegisterFormClass(TCCEWizardForms);
-
-  for i := 0 to Pred(Self.ComponentCount) do
-  begin
-    if Components[i] is TLabel then
-      theme.ApplyTheme(TLabel(Components[i]));
-//
-//    if Components[i] is TComboBox then
-//      theme.ApplyTheme(TComboBox(Components[i]));
-    if Components[i] is TPageControl then
-    begin
-      theme.ApplyTheme(TPageControl(Components[i]));
-      TPageControl(Components[i]).Repaint;
-    end;
-
-    if Components[i] is TTabSheet then
-    begin
-      theme.ApplyTheme(TTabSheet(Components[i]));
-      TTabSheet(Components[i]).Repaint;
-    end;
-
-    if Components[i] is TPanel then
-      theme.ApplyTheme(TPanel(Components[i]));
-
-    if Components[i] is TLabeledEdit then
-      theme.ApplyTheme(TLabeledEdit(Components[i]));
-
-    if Components[i] is TWinControl then
-      theme.ApplyTheme(TWinControl(Components[i]));
-  end;
-//    theme.StyleServices.
-  {$ENDIF}
 end;
 
 procedure TCCEWizardForms.btnPreviousClick(Sender: TObject);
@@ -371,11 +325,6 @@ begin
   HideTabs;
   InitialValues;
   tvPaths.ExpandAll;
-end;
-
-procedure TCCEWizardForms.FormShow(Sender: TObject);
-begin
-//  ApplyTheme;
 end;
 
 function TCCEWizardForms.GetKeyNode(ANode: TTreeNode): String;

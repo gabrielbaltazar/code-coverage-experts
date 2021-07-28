@@ -84,6 +84,9 @@ begin
   if FGenerateLog then
     result := result + '-lt ';
 
+  if FGenerateEmma then
+    result := result + '-emma -meta ';
+
   if FGenerateHtml then
     result := result + '-html ';
 
