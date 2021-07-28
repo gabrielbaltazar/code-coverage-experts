@@ -243,6 +243,15 @@ object CCEWizardForms: TCCEWizardForms
         TabOrder = 5
         OnClick = btnShowLogClick
       end
+      object btnRun: TButton
+        Left = 466
+        Top = 16
+        Width = 139
+        Height = 57
+        Caption = 'Run'
+        TabOrder = 6
+        OnClick = btnRunClick
+      end
     end
   end
   object pnlBottom: TPanel
@@ -254,7 +263,7 @@ object CCEWizardForms: TCCEWizardForms
     BevelOuter = bvNone
     TabOrder = 1
     object btnNext: TButton
-      Left = 324
+      Left = 112
       Top = 6
       Width = 75
       Height = 25
@@ -263,7 +272,7 @@ object CCEWizardForms: TCCEWizardForms
       OnClick = btnNextClick
     end
     object btnPrevious: TButton
-      Left = 224
+      Left = 15
       Top = 6
       Width = 75
       Height = 25
@@ -271,12 +280,12 @@ object CCEWizardForms: TCCEWizardForms
       TabOrder = 1
       OnClick = btnPreviousClick
     end
-    object btnFinish: TButton
-      Left = 436
+    object btnClose: TButton
+      Left = 808
       Top = 6
-      Width = 75
+      Width = 79
       Height = 25
-      Caption = 'Finish'
+      Caption = 'Close'
       TabOrder = 2
     end
   end

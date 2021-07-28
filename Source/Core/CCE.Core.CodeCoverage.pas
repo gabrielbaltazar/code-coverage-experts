@@ -119,8 +119,9 @@ begin
   result := Self;
   Save;
 
+  ExecuteAndWait(BasePath, FileCodeCoverageBat);
 //  Winexec(PAnsiChar(FileCodeCoverageBat), SW_NORMAL);
-  WinExec(PAnsiChar('C:\WINDOWS\Command.COM /C ' + FileCodeCoverageBat),SW_SHOW);
+//  WinExec(PAnsiChar('C:\WINDOWS\Command.COM /C ' + FileCodeCoverageBat),SW_SHOW);
 //  ShellExecute(HInstance, 'open', PChar(GetReportHTMLName), '', '', 0);
 //  ShowMessage('foi');
 

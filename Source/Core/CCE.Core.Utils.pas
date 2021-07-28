@@ -3,6 +3,7 @@ unit CCE.Core.Utils;
 interface
 
 uses
+  CCE.dprocess,
   System.SysUtils,
   System.Types,
   Vcl.Forms,
@@ -12,7 +13,7 @@ uses
 function RelativeToAbsolutePath(const RelativePath, BasePath: string): string;
 function AbsolutePathToRelative(const AbsolutePath, BasePath: string): string;
 
-procedure ExecuteAndWait(const ACommand: string);
+procedure ExecuteAndWait(const APath, ACommand: string);
 procedure OpenFile(const AFileName: String);
 
 function PathCanonicalize(lpszDst: PChar; lpszSrc: PChar): LongBool; stdcall;
@@ -39,35 +40,11 @@ begin
   result := Path;
 end;
 
-procedure ExecuteAndWait(const ACommand: string);
+procedure ExecuteAndWait(const APath, ACommand: string);
 var
-  tmpStartupInfo: TStartupInfo;
-  tmpProcessInformation: TProcessInformation;
-  tmpProgram: String;
+  output: AnsiString;
 begin
-  tmpProgram := trim(ACommand);
-  FillChar(tmpStartupInfo, SizeOf(tmpStartupInfo), 0);
-  with tmpStartupInfo do
-  begin
-    cb := SizeOf(TStartupInfo);
-    wShowWindow := SW_SHOWNORMAL;
-  end;
-
-  if CreateProcess(nil, pchar(tmpProgram), nil, nil, true, CREATE_NO_WINDOW,
-    nil, nil, tmpStartupInfo, tmpProcessInformation) then
-  begin
-    // loop every 10 ms
-    while WaitForSingleObject(tmpProcessInformation.hProcess, 10) > 0 do
-    begin
-      Application.ProcessMessages;
-    end;
-    CloseHandle(tmpProcessInformation.hProcess);
-    CloseHandle(tmpProcessInformation.hThread);
-  end
-  else
-  begin
-    RaiseLastOSError;
-  end;
+  RunCommandIndir(APath, 'cmd', ['/c', ACommand], output, [poNoConsole]);
 end;
 
 procedure OpenFile(const AFileName: String);

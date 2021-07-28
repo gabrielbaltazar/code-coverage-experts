@@ -34,7 +34,6 @@ implementation
 function TCCEHelperTreeView.GetNodeParent(AParentCaption: String; AParentLevel: Integer): TTreeNode;
 var
   i: Integer;
-  node: TTreeNode;
 begin
   result := nil;
   for i := 0 to Pred(Items.Count) do

@@ -38,7 +38,7 @@ type
     chkXmlReport: TCheckBox;
     chkHtmlReport: TCheckBox;
     chkEmmaReport: TCheckBox;
-    btnFinish: TButton;
+    btnClose: TButton;
     chkLog: TCheckBox;
     chkUseRelativePath: TCheckBox;
     tsTreeView: TTabSheet;
@@ -51,6 +51,7 @@ type
     btnShowHTML: TButton;
     btnShowXML: TButton;
     btnShowLog: TButton;
+    btnRun: TButton;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnPreviousClick(Sender: TObject);
@@ -66,6 +67,7 @@ type
     procedure btnShowHTMLClick(Sender: TObject);
     procedure btnShowXMLClick(Sender: TObject);
     procedure btnShowLogClick(Sender: TObject);
+    procedure btnRunClick(Sender: TObject);
   private
     FProject: ICCEProject;
     FCoverage: ICCECodeCoverage;
@@ -202,10 +204,16 @@ begin
   SelectPagePrevious;
 end;
 
-procedure TCCEWizardForms.btnSaveClick(Sender: TObject);
+procedure TCCEWizardForms.btnRunClick(Sender: TObject);
 begin
   SetCoverage;
   FCoverage.Execute;
+end;
+
+procedure TCCEWizardForms.btnSaveClick(Sender: TObject);
+begin
+  SetCoverage;
+  FCoverage.Save;
 end;
 
 procedure TCCEWizardForms.btnSelectCodeCoverageClick(Sender: TObject);
@@ -495,8 +503,7 @@ begin
     .GenerateXml(chkXmlReport.Checked)
     .GenerateEmma(chkEmmaReport.Checked)
     .GenerateLog(chkLog.Checked)
-    .UseRelativePath(chkUseRelativePath.Checked)
-    .Execute;
+    .UseRelativePath(chkUseRelativePath.Checked);
 end;
 
 procedure TCCEWizardForms.tvPathsDblClick(Sender: TObject);
