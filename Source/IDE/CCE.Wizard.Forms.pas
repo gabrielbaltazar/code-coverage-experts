@@ -15,29 +15,16 @@ uses
   System.Generics.Collections, Vcl.CheckLst, Vcl.Menus, Vcl.Buttons,
   System.ImageList, Vcl.ImgList, Vcl.Imaging.pngimage, Winapi.ShellAPI;
 
+const
+  COLOR_PRIMARY = $00FB7E15;
+  COLOR_DISABLED = $00aba6a0;
+
 type
   TCCEWizardForms = class(TForm)
     pgcWizard: TPageControl;
     tsFiles: TTabSheet;
     pnlBottom: TPanel;
-    btnNext: TButton;
-    btnPrevious: TButton;
-    edtExeName: TLabeledEdit;
-    btnSelectExeName: TButton;
-    edtMapFileName: TLabeledEdit;
-    btnSelectMapFile: TButton;
-    edtCoverageExeName: TLabeledEdit;
-    btnSelectCodeCoverage: TButton;
-    edtOutputReport: TLabeledEdit;
-    btnOutputReport: TButton;
     openTextDialog: TOpenTextFileDialog;
-    grpOutputFormat: TGroupBox;
-    chkXmlReport: TCheckBox;
-    chkHtmlReport: TCheckBox;
-    chkEmmaReport: TCheckBox;
-    btnClose: TButton;
-    chkLog: TCheckBox;
-    chkUseRelativePath: TCheckBox;
     tsTreeView: TTabSheet;
     tvPaths: TTreeView;
     iltreeView: TImageList;
@@ -51,15 +38,30 @@ type
     imgRun: TImage;
     imgSave: TImage;
     imgFolder: TImage;
+    pnlContentFiles: TPanel;
+    pnlBody: TPanel;
+    edtCoverageExeName: TLabeledEdit;
+    edtExeName: TLabeledEdit;
+    edtMapFileName: TLabeledEdit;
+    edtOutputReport: TLabeledEdit;
+    grpOutputFormat: TGroupBox;
+    chkXmlReport: TCheckBox;
+    chkHtmlReport: TCheckBox;
+    chkEmmaReport: TCheckBox;
+    chkLog: TCheckBox;
+    chkUseRelativePath: TCheckBox;
+    pnlTitle: TPanel;
+    lblTitleSettings: TLabel;
+    btnNext: TPanel;
+    btnPrevious: TPanel;
+    btnClose: TPanel;
+    imgGithub: TImage;
+    btnSelectCodeCoverage2: TImage;
+    btnSelectExeName: TImage;
+    btnSelectMapFile: TImage;
+    btnOutputReport: TImage;
     procedure FormCreate(Sender: TObject);
-    procedure btnPreviousClick(Sender: TObject);
-    procedure btnNextClick(Sender: TObject);
-    procedure btnSelectExeNameClick(Sender: TObject);
-    procedure btnSelectCodeCoverageClick(Sender: TObject);
-    procedure btnSelectMapFileClick(Sender: TObject);
-    procedure btnOutputReportClick(Sender: TObject);
     procedure tvPathsDblClick(Sender: TObject);
-    procedure btnCloseClick(Sender: TObject);
     procedure imgRunClick(Sender: TObject);
     procedure imgSaveClick(Sender: TObject);
     procedure imgSetDetailedClick(Sender: TObject);
@@ -68,6 +70,14 @@ type
     procedure imgXmlClick(Sender: TObject);
     procedure imgTxtClick(Sender: TObject);
     procedure imgFolderClick(Sender: TObject);
+    procedure btnPreviousClick(Sender: TObject);
+    procedure btnNextClick(Sender: TObject);
+    procedure btnCloseClick(Sender: TObject);
+    procedure btnSelectCodeCoverage2Click(Sender: TObject);
+    procedure btnSelectExeNameClick(Sender: TObject);
+    procedure btnSelectMapFileClick(Sender: TObject);
+    procedure btnOutputReportClick(Sender: TObject);
+    procedure imgGithubClick(Sender: TObject);
   private
     FProject: ICCEProject;
     FCoverage: ICCECodeCoverage;
@@ -95,6 +105,7 @@ type
     procedure HideTabs;
     procedure SelectPageNext;
     procedure SelectPagePrevious;
+    procedure SetColorButtons;
   public
     constructor create(AOwner: TComponent; Project: IOTAProject); reintroduce;
     destructor Destroy; override;
@@ -155,19 +166,14 @@ begin
   end;
 end;
 
-procedure TCCEWizardForms.btnPreviousClick(Sender: TObject);
-begin
-  SelectPagePrevious;
-end;
-
-procedure TCCEWizardForms.btnSelectCodeCoverageClick(Sender: TObject);
+procedure TCCEWizardForms.btnSelectCodeCoverage2Click(Sender: TObject);
 begin
   searchFile('Code Coverage File', 'exe', edtCoverageExeName);
 end;
 
 procedure TCCEWizardForms.btnSelectExeNameClick(Sender: TObject);
 begin
-  searchFile('Test Project', 'exe', edtExeName);
+  searchFile('Delphi Test Project', 'exe', edtExeName);
 end;
 
 procedure TCCEWizardForms.btnSelectMapFileClick(Sender: TObject);
@@ -231,21 +237,6 @@ begin
   CheckParents(nodeParent);
 end;
 
-procedure TCCEWizardForms.btnCloseClick(Sender: TObject);
-begin
-  ModalResult := mrClose;
-end;
-
-procedure TCCEWizardForms.btnNextClick(Sender: TObject);
-begin
-  SelectPageNext;
-end;
-
-procedure TCCEWizardForms.btnOutputReportClick(Sender: TObject);
-begin
-  selectFolder(edtOutputReport);
-end;
-
 procedure TCCEWizardForms.checkTreeView;
 var
   imageIndex: Integer;
@@ -282,6 +273,8 @@ begin
   HideTabs;
   InitialValues;
   tvPaths.ExpandAll;
+  SetColorButtons;
+
 end;
 
 function TCCEWizardForms.GetKeyNode(ANode: TTreeNode): String;
@@ -328,6 +321,15 @@ procedure TCCEWizardForms.imgFolderClick(Sender: TObject);
 begin
   SetCoverage;
   ShellExecute(HInstance, 'open', PChar(FCoverage.BasePath), '', '', SW_SHOWNORMAL);
+end;
+
+procedure TCCEWizardForms.imgGithubClick(Sender: TObject);
+var
+  url: PWideChar;
+begin
+  url := 'https://github.com/gabrielbaltazar/code-coverage-experts';
+
+  ShellExecute(HInstance, 'open', url, '', '', SW_SHOWNORMAL);
 end;
 
 procedure TCCEWizardForms.imgHtmlClick(Sender: TObject);
@@ -403,6 +405,26 @@ begin
 
 end;
 
+procedure TCCEWizardForms.btnCloseClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TCCEWizardForms.btnNextClick(Sender: TObject);
+begin
+  SelectPageNext;
+end;
+
+procedure TCCEWizardForms.btnOutputReportClick(Sender: TObject);
+begin
+  selectFolder(edtOutputReport);
+end;
+
+procedure TCCEWizardForms.btnPreviousClick(Sender: TObject);
+begin
+  SelectPagePrevious;
+end;
+
 procedure TCCEWizardForms.RefreshAll;
 var
   nodeSelect: TArray<TTreeNode>;
@@ -446,6 +468,8 @@ begin
   pgcWizard.SelectNextPage(True, False);
   btnNext.Enabled := pgcWizard.ActivePageIndex < (pgcWizard.PageCount - 1);
   btnPrevious.Enabled := True;
+
+  setColorButtons;
 end;
 
 procedure TCCEWizardForms.SelectPagePrevious;
@@ -453,6 +477,20 @@ begin
   pgcWizard.SelectNextPage(False, False);
   btnPrevious.Enabled := pgcWizard.ActivePageIndex > 0;
   btnNext.Enabled := True;
+
+  setColorButtons;
+end;
+
+procedure TCCEWizardForms.SetColorButtons;
+begin
+  btnNext.Color := COLOR_PRIMARY;
+  btnPrevious.Color := COLOR_PRIMARY;
+
+  if not btnNext.Enabled then
+    btnNext.Color := COLOR_DISABLED;
+
+  if not btnPrevious.Enabled then
+    btnPrevious.Color := COLOR_DISABLED;
 end;
 
 procedure TCCEWizardForms.SetCoverage;
