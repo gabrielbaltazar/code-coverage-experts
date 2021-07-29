@@ -31,8 +31,6 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function FileCodeCoverageBat: string;
     function CodeCoverageCommand: String;
 
-    function BasePath: string;
-
     procedure GenerateFilePaths;
     procedure GenerateFileUnits;
 
@@ -45,6 +43,8 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function GetReportXMLName: String;
     function GetCoverageLogFileName: string;
   protected
+    function BasePath: string;
+
     function CodeCoverageFileName(Value: String): ICCECodeCoverage;
     function ExeFileName(Value: String): ICCECodeCoverage;
     function MapFileName(Value: String): ICCECodeCoverage;
@@ -120,15 +120,8 @@ end;
 function TCCECoreCodeCoverage.Execute: ICCECodeCoverage;
 begin
   result := Self;
-  Save;
 
   ExecuteAndWait(BasePath, FileCodeCoverageBat);
-//  Winexec(PAnsiChar(FileCodeCoverageBat), SW_NORMAL);
-//  WinExec(PAnsiChar('C:\WINDOWS\Command.COM /C ' + FileCodeCoverageBat),SW_SHOW);
-//  ShellExecute(HInstance, 'open', PChar(GetReportHTMLName), '', '', 0);
-//  ShowMessage('foi');
-
-
 end;
 
 function TCCECoreCodeCoverage.ExeFileName(Value: String): ICCECodeCoverage;

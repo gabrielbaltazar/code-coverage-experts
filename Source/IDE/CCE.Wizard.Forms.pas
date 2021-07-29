@@ -13,7 +13,7 @@ uses
   CCE.Core.CodeCoverage,
   CCE.Helpers.TreeView,
   System.Generics.Collections, Vcl.CheckLst, Vcl.Menus, Vcl.Buttons,
-  System.ImageList, Vcl.ImgList;
+  System.ImageList, Vcl.ImgList, Vcl.Imaging.pngimage, Winapi.ShellAPI;
 
 type
   TCCEWizardForms = class(TForm)
@@ -22,8 +22,6 @@ type
     pnlBottom: TPanel;
     btnNext: TButton;
     btnPrevious: TButton;
-    pnlTop: TPanel;
-    lblTitle: TLabel;
     edtExeName: TLabeledEdit;
     btnSelectExeName: TButton;
     edtMapFileName: TLabeledEdit;
@@ -43,14 +41,16 @@ type
     tsTreeView: TTabSheet;
     tvPaths: TTreeView;
     iltreeView: TImageList;
-    TabSheet1: TTabSheet;
-    btnBuild: TButton;
-    btnSetDetailed: TButton;
-    btnSave: TButton;
-    btnShowHTML: TButton;
-    btnShowXML: TButton;
-    btnShowLog: TButton;
-    btnRun: TButton;
+    Panel1: TPanel;
+    imgSetDetailed: TImage;
+    ilMenu: TImageList;
+    imgXml: TImage;
+    imgTxt: TImage;
+    imgHtml: TImage;
+    imgBuild: TImage;
+    imgRun: TImage;
+    imgSave: TImage;
+    imgFolder: TImage;
     procedure FormCreate(Sender: TObject);
     procedure btnPreviousClick(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
@@ -59,14 +59,15 @@ type
     procedure btnSelectMapFileClick(Sender: TObject);
     procedure btnOutputReportClick(Sender: TObject);
     procedure tvPathsDblClick(Sender: TObject);
-    procedure btnSaveClick(Sender: TObject);
-    procedure btnSetDetailedClick(Sender: TObject);
-    procedure btnBuildClick(Sender: TObject);
-    procedure btnShowHTMLClick(Sender: TObject);
-    procedure btnShowXMLClick(Sender: TObject);
-    procedure btnShowLogClick(Sender: TObject);
-    procedure btnRunClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
+    procedure imgRunClick(Sender: TObject);
+    procedure imgSaveClick(Sender: TObject);
+    procedure imgSetDetailedClick(Sender: TObject);
+    procedure imgBuildClick(Sender: TObject);
+    procedure imgHtmlClick(Sender: TObject);
+    procedure imgXmlClick(Sender: TObject);
+    procedure imgTxtClick(Sender: TObject);
+    procedure imgFolderClick(Sender: TObject);
   private
     FProject: ICCEProject;
     FCoverage: ICCECodeCoverage;
@@ -159,21 +160,6 @@ begin
   SelectPagePrevious;
 end;
 
-procedure TCCEWizardForms.btnRunClick(Sender: TObject);
-begin
-  SetCoverage;
-  FCoverage
-    .Save
-    .Execute;
-end;
-
-procedure TCCEWizardForms.btnSaveClick(Sender: TObject);
-begin
-  SetCoverage;
-  FCoverage.Save;
-  ShowMessage('OK');
-end;
-
 procedure TCCEWizardForms.btnSelectCodeCoverageClick(Sender: TObject);
 begin
   searchFile('Code Coverage File', 'exe', edtCoverageExeName);
@@ -187,30 +173,6 @@ end;
 procedure TCCEWizardForms.btnSelectMapFileClick(Sender: TObject);
 begin
   searchFile('Map File', 'map', edtMapFileName);
-end;
-
-procedure TCCEWizardForms.btnSetDetailedClick(Sender: TObject);
-begin
-  FProject.SetDetailedMapFile;
-  ShowMessage('OK');
-end;
-
-procedure TCCEWizardForms.btnShowHTMLClick(Sender: TObject);
-begin
-  SetCoverage;
-  FCoverage.ShowHTMLReport;
-end;
-
-procedure TCCEWizardForms.btnShowLogClick(Sender: TObject);
-begin
-  SetCoverage;
-  FCoverage.ShowLogCoverage;
-end;
-
-procedure TCCEWizardForms.btnShowXMLClick(Sender: TObject);
-begin
-  SetCoverage;
-  FCoverage.ShowXMLReport;
 end;
 
 procedure TCCEWizardForms.CheckChilds(ANode: TTreeNode; AIndex: Integer);
@@ -267,11 +229,6 @@ begin
   nodeParent.ImageIndex := index;
   nodeParent.SelectedIndex := index;
   CheckParents(nodeParent);
-end;
-
-procedure TCCEWizardForms.btnBuildClick(Sender: TObject);
-begin
-  FProject.Build;
 end;
 
 procedure TCCEWizardForms.btnCloseClick(Sender: TObject);
@@ -360,6 +317,56 @@ begin
     pgcWizard.Pages[i].TabVisible := False;
 
   SelectPageNext;
+end;
+
+procedure TCCEWizardForms.imgBuildClick(Sender: TObject);
+begin
+  FProject.Build;
+end;
+
+procedure TCCEWizardForms.imgFolderClick(Sender: TObject);
+begin
+  SetCoverage;
+  ShellExecute(HInstance, 'open', PChar(FCoverage.BasePath), '', '', SW_SHOWNORMAL);
+end;
+
+procedure TCCEWizardForms.imgHtmlClick(Sender: TObject);
+begin
+  SetCoverage;
+  FCoverage.ShowHTMLReport;
+end;
+
+procedure TCCEWizardForms.imgRunClick(Sender: TObject);
+begin
+  SetCoverage;
+  FCoverage
+    .Save
+    .Execute;
+end;
+
+procedure TCCEWizardForms.imgSaveClick(Sender: TObject);
+begin
+  SetCoverage;
+  FCoverage.Save;
+  ShowMessage('OK');
+end;
+
+procedure TCCEWizardForms.imgSetDetailedClick(Sender: TObject);
+begin
+  FProject.SetDetailedMapFile;
+  ShowMessage('OK');
+end;
+
+procedure TCCEWizardForms.imgTxtClick(Sender: TObject);
+begin
+  SetCoverage;
+  FCoverage.ShowLogCoverage;
+end;
+
+procedure TCCEWizardForms.imgXmlClick(Sender: TObject);
+begin
+  SetCoverage;
+  FCoverage.ShowXMLReport;
 end;
 
 procedure TCCEWizardForms.InitialValues;
@@ -470,5 +477,10 @@ procedure TCCEWizardForms.tvPathsDblClick(Sender: TObject);
 begin
   CheckTreeView;
 end;
+
+initialization
+
+finalization
+  CCEWizardForms.Free;
 
 end.

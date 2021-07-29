@@ -252,12 +252,10 @@ end;
 
 procedure TCCEContextMenuWizard.OnExecuteCodeCoverageWizard(const MenuContextList: IInterfaceList);
 begin
-  CCEWizardForms := TCCEWizardForms.Create(nil, FProject);
-  try
-    CCEWizardForms.ShowModal;
-  finally
-    CCEWizardForms.Free;
-  end;
+  if not Assigned(CCEWizardForms) then
+    CCEWizardForms := TCCEWizardForms.Create(nil, FProject);
+
+  CCEWizardForms.Show;
 end;
 
 initialization

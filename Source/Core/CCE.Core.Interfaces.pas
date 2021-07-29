@@ -32,8 +32,9 @@ type
 
   ICCECodeCoverage = interface
     ['{DCE40126-F975-4BAA-8CAE-3BD2ED2AF6EF}']
+    function BasePath: string;
     function CodeCoverageFileName(Value: String): ICCECodeCoverage;
-    function ExeFileName(Value: String): ICCECodeCoverage;
+    function ExeFileName(Value: String): ICCECodeCoverage; overload;
     function MapFileName(Value: String): ICCECodeCoverage;
     function OutputReport(Value: String): ICCECodeCoverage;
     function Paths(Values: TArray<String>): ICCECodeCoverage;
