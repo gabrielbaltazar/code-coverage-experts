@@ -21,15 +21,18 @@ type TCCECoreProject = class(TInterfacedObject, ICCEProject)
   private
     FProject: IOTAProject;
     FActiveConfig: IOTABuildConfiguration;
-    FSelectedPaths: TList<String>;
-    FSelectedUnits: TList<String>;
+    FPaths: TList<String>;
+    FUnits: TList<String>;
 
     function ProjectPath: string;
     function GetSearchPaths: TList<String>;
 
     procedure SetAllPaths;
+    procedure SetAllUnits(Path: String);
+
+    procedure AddPath(Value: String);
+    procedure AddUnit(Value: String);
   public
-    function Clear: ICCEProject;
     function OutputPath: string;
     function ExeName: String;
     function DprFileName: string;
@@ -40,12 +43,6 @@ type TCCECoreProject = class(TInterfacedObject, ICCEProject)
     function ListAllPaths: TArray<String>;
     function ListAllUnits(Path: String): TArray<String>; overload;
     function ListAllUnits: TArray<String>; overload;
-
-    function AddPath(Value: string): ICCEProject;
-    function AddUnit(Value: string): ICCEProject;
-
-    function RemovePath(Value: String): ICCEProject;
-    function RemoveUnit(Value: String): ICCEProject;
 
     function Build: ICCEProject;
 
@@ -58,18 +55,16 @@ implementation
 
 { TCCECoreProject }
 
-function TCCECoreProject.AddPath(Value: string): ICCEProject;
+procedure TCCECoreProject.AddPath(Value: String);
 begin
-  result := Self;
-  if not FSelectedPaths.Contains(Value) then
-    FSelectedPaths.Add(Value);
+  if not FPaths.Contains(Value) then
+    FPaths.Add(Value);
 end;
 
-function TCCECoreProject.AddUnit(Value: string): ICCEProject;
+procedure TCCECoreProject.AddUnit(Value: String);
 begin
-  result := Self;
-  if not FSelectedUnits.Contains(Value) then
-    FSelectedUnits.Add(Value);
+  if not FUnits.Contains(Value) then
+    FUnits.Add(Value);
 end;
 
 function TCCECoreProject.Build: ICCEProject;
@@ -79,34 +74,22 @@ begin
     .BuildProject(TOTACompileMode.cmOTABuild, True, True);
 end;
 
-function TCCECoreProject.Clear: ICCEProject;
-var
-  i: Integer;
-begin
-  result := Self;
-  for i := Pred(FSelectedPaths.Count) downto 0 do
-    RemovePath(FSelectedPaths[i]);
-
-  for i := Pred(FSelectedUnits.Count) downto 0 do
-    RemoveUnit(FSelectedUnits[i]);
-end;
-
 constructor TCCECoreProject.create(Project: IOTAProject);
 begin
   FProject := Project;
   FActiveConfig := (Project.ProjectOptions as IOTAProjectOptionsConfigurations)
                       .ActiveConfiguration;
 
-  FSelectedPaths := TList<String>.create;
-  FSelectedUnits := TList<String>.create;
+  FPaths := TList<String>.create;
+  FUnits := TList<String>.create;
 
   SetAllPaths;
 end;
 
 destructor TCCECoreProject.Destroy;
 begin
-  FSelectedPaths.Free;
-  FSelectedUnits.Free;
+  FPaths.Free;
+  FUnits.Free;
   inherited;
 end;
 
@@ -148,27 +131,29 @@ end;
 
 function TCCECoreProject.ListAllPaths: TArray<String>;
 begin
-  result := FSelectedPaths.ToArray;
+  result := FPaths.ToArray;
 end;
 
 function TCCECoreProject.ListAllUnits: TArray<String>;
 begin
-  result := FSelectedUnits.ToArray;
+  result := FUnits.ToArray;
 end;
 
 function TCCECoreProject.ListAllUnits(Path: String): TArray<String>;
 var
   i: Integer;
-  files: TStringDynArray;
+  unitPath: string;
 begin
-  files := TDirectory.GetFiles(Path);
+  if not Path.EndsWith('\') then
+    Path := Path + '\';
 
-  for i := 0 to Pred(Length(files)) do
+  for i := 0 to Pred(FUnits.Count) do
   begin
-    if ExtractFileExt(files[i]) = '.pas' then
+    unitPath := ExtractFilePath(FUnits[i]).ToLower;
+    if Path.ToLower = unitPath then
     begin
       SetLength(result, Length(result) + 1);
-      result[Length(result) - 1] := files[i];
+      result[Length(result) - 1] := FUnits[i];
     end;
   end;
 end;
@@ -198,18 +183,6 @@ begin
   result := ExtractFilePath(FProject.FileName);
 end;
 
-function TCCECoreProject.RemovePath(Value: String): ICCEProject;
-begin
-  result := Self;
-  FSelectedPaths.Remove(Value);
-end;
-
-function TCCECoreProject.RemoveUnit(Value: String): ICCEProject;
-begin
-  result := Self;
-  FSelectedUnits.Remove(Value);
-end;
-
 procedure TCCECoreProject.SetAllPaths;
 var
   i: Integer;
@@ -222,6 +195,8 @@ begin
     begin
       path := ExtractFilePath(FProject.GetModule(i).FileName);
       AddPath(path);
+
+      SetAllUnits(path);
     end;
   end;
 
@@ -231,9 +206,25 @@ begin
     begin
       path := searchPath.Items[i];
       AddPath(path);
+
+      SetAllUnits(path);
     end;
   finally
     searchPath.Free;
+  end;
+end;
+
+procedure TCCECoreProject.SetAllUnits(Path: String);
+var
+  i: Integer;
+  files: TStringDynArray;
+begin
+  files := TDirectory.GetFiles(Path);
+
+  for i := 0 to Pred(Length(files)) do
+  begin
+    if ExtractFileExt(files[i]) = '.pas' then
+      AddUnit(files[i]);
   end;
 end;
 

@@ -7,6 +7,7 @@ uses
   CCE.Core.Utils,
   System.SysUtils,
   System.Classes,
+  System.Generics.Collections,
   Winapi.ShellAPI,
   Winapi.Windows,
   Vcl.Dialogs;
@@ -18,8 +19,8 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     FExeFileName: String;
     FMapFileName: String;
     FOutputReport: String;
-    FPaths: TArray<String>;
-    FUnits: TArray<String>;
+    FUnitsFiles: TList<string>;
+    FPaths: TList<string>;
     FGenerateHtml: Boolean;
     FGenerateXml: Boolean;
     FGenerateEmma: Boolean;
@@ -44,6 +45,7 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function GetCoverageLogFileName: string;
   protected
     function BasePath: string;
+    function Clear: ICCECodeCoverage;
 
     function CodeCoverageFileName(Value: String): ICCECodeCoverage;
     function ExeFileName(Value: String): ICCECodeCoverage;
@@ -57,6 +59,9 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function GenerateLog(Value: Boolean): ICCECodeCoverage;
     function UseRelativePath(Value: Boolean): ICCECodeCoverage;
 
+    function AddUnit(Value: String): ICCECodeCoverage;
+    function AddPath(Value: String): ICCECodeCoverage;
+
     function Save: ICCECodeCoverage;
     function Execute: ICCECodeCoverage;
 
@@ -67,15 +72,37 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
   public
     constructor create;
     class function New: ICCECodeCoverage;
+    destructor Destroy; override;
 end;
 
 implementation
 
 { TCCECoreCodeCoverage }
 
+function TCCECoreCodeCoverage.AddPath(Value: String): ICCECodeCoverage;
+begin
+  result := Self;
+  if not FPaths.Contains(Value) then
+    FPaths.Add(Value);
+end;
+
+function TCCECoreCodeCoverage.AddUnit(Value: String): ICCECodeCoverage;
+begin
+  result := Self;
+  if not FUnitsFiles.Contains(Value) then
+    FUnitsFiles.Add(Value);
+end;
+
 function TCCECoreCodeCoverage.BasePath: string;
 begin
   result := ExtractFilePath(FExeFileName);
+end;
+
+function TCCECoreCodeCoverage.Clear: ICCECodeCoverage;
+begin
+  result := Self;
+  FUnitsFiles.Clear;
+  FPaths.Clear;
 end;
 
 function TCCECoreCodeCoverage.CodeCoverageCommand: String;
@@ -115,6 +142,16 @@ begin
   FGenerateHtml := True;
   FGenerateEmma := True;
   FUseRelativePath := True;
+
+  FUnitsFiles := TList<String>.create;
+  FPaths := TList<String>.create;
+end;
+
+destructor TCCECoreCodeCoverage.Destroy;
+begin
+  FUnitsFiles.Free;
+  FPaths.Free;
+  inherited;
 end;
 
 function TCCECoreCodeCoverage.Execute: ICCECodeCoverage;
@@ -153,12 +190,12 @@ end;
 
 procedure TCCECoreCodeCoverage.GenerateFilePaths;
 var
-  i: Integer;
   path: string;
+  i : Integer;
 begin
   with TStringList.Create do
   try
-    for i := 0 to Pred(Length(FPaths)) do
+    for i := 0 to Pred(FPaths.Count) do
     begin
       path := FPaths[i];
       if FUseRelativePath then
@@ -177,14 +214,14 @@ end;
 
 procedure TCCECoreCodeCoverage.GenerateFileUnits;
 var
-  i: Integer;
   unitFile: String;
+  i : Integer;
 begin
   with TStringList.Create do
   try
-    for i := 0 to Pred(Length(FUnits)) do
+    for i := 0 to Pred(FUnitsFiles.Count) do
     begin
-      unitFile := ExtractFileName(FUnits[i]);
+      unitFile := ExtractFileName(FUnitsFiles[i]);
       Add(unitFile);
     end;
 
@@ -280,9 +317,12 @@ begin
 end;
 
 function TCCECoreCodeCoverage.Paths(Values: TArray<String>): ICCECodeCoverage;
+var
+  i: Integer;
 begin
   result := Self;
-  FPaths := Values;
+  for i := 0 to Pred(Length(Values)) do
+    AddPath(Values[i]);
 end;
 
 function TCCECoreCodeCoverage.Save: ICCECodeCoverage;
@@ -319,9 +359,12 @@ begin
 end;
 
 function TCCECoreCodeCoverage.Units(Values: TArray<String>): ICCECodeCoverage;
+var
+  i: Integer;
 begin
   result := Self;
-  FUnits := Values;
+  for i := 0 to Pred(Length(Values)) do
+    AddUnit(Values[i]);
 end;
 
 function TCCECoreCodeCoverage.UseRelativePath(Value: Boolean): ICCECodeCoverage;

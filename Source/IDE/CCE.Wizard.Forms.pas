@@ -85,13 +85,12 @@ type
     procedure AddPathInTreeView(APath: String);
     function GetKeyNode(ANode: TTreeNode): String;
 
-    procedure RefreshAll;
-
     procedure SetCoverage;
+    procedure SetCoverageUnits;
 
-    procedure CheckTreeView;
-    procedure CheckChilds (ANode: TTreeNode; AIndex: Integer);
-    procedure CheckParents(ANode: TTreeNode);
+    procedure SetStateTreeView;
+    procedure SetStateChilds(ANode: TTreeNode; AStateIndex: Integer);
+    procedure SetStateParents(ANode: TTreeNode);
 
     procedure searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);
     procedure selectFolder(AComponent: TCustomEdit);
@@ -194,7 +193,7 @@ begin
   searchFile('Map File', 'map', edtMapFileName);
 end;
 
-procedure TCCEWizardForms.CheckChilds(ANode: TTreeNode; AIndex: Integer);
+procedure TCCEWizardForms.SetStateChilds(ANode: TTreeNode; AStateIndex: Integer);
 var
   childNode: TTreeNode;
 begin
@@ -202,14 +201,14 @@ begin
 
   while childNode <> nil do
   begin
-    childNode.StateIndex := AIndex;
-    CheckChilds(childNode, AIndex);
+    childNode.StateIndex := AStateIndex;
+    SetStateChilds(childNode, AStateIndex);
 
     childNode := ANode.GetNextChild(childNode);
   end;
 end;
 
-procedure TCCEWizardForms.CheckParents(ANode: TTreeNode);
+procedure TCCEWizardForms.SetStateParents(ANode: TTreeNode);
 var
   nodeParent: TTreeNode;
   hasCheck: Boolean;
@@ -245,10 +244,10 @@ begin
     index := CHECKED_INDEX;
 
   nodeParent.StateIndex := index;
-  CheckParents(nodeParent);
+  SetStateParents(nodeParent);
 end;
 
-procedure TCCEWizardForms.checkTreeView;
+procedure TCCEWizardForms.SetStateTreeView;
 var
   stateIndex: Integer;
   nodeSelected: TTreeNode;
@@ -262,8 +261,8 @@ begin
 
   nodeSelected.StateIndex := stateIndex;
 
-  CheckChilds(nodeSelected, stateIndex);
-  CheckParents(nodeSelected);
+  SetStateChilds(nodeSelected, stateIndex);
+  SetStateParents(nodeSelected);
 end;
 
 constructor TCCEWizardForms.create(AOwner: TComponent);
@@ -305,7 +304,7 @@ procedure TCCEWizardForms.HideTabs;
 var
   i: Integer;
 begin
-  pgcWizard.ActivePageIndex := 0;
+  pgcWizard.ActivePage := tsFiles;
 
   for i := 0 to Pred(pgcWizard.PageCount) do
     pgcWizard.Pages[i].TabVisible := False;
@@ -377,8 +376,6 @@ begin
   edtExeName.Text := FProject.ExeName;
   edtMapFileName.Text := FProject.MapFileName;
   edtOutputReport.Text := ExtractFilePath(FProject.ExeName) + 'report';
-
-  ListPaths;
 end;
 
 procedure TCCEWizardForms.ListPaths;
@@ -403,25 +400,25 @@ begin
   units := FProject.ListAllUnits(Path);
   for i := 0 to Pred(Length( units )) do
     AddPathInTreeView(units[i]);
-
 end;
 
 function TCCEWizardForms.Project(Value: IOTAProject): TCCEWizardForms;
 begin
   result := Self;
-  FTreeNodes.Clear;
 
   if (not Assigned(FProject)) or (FProject.DprFileName <> Value.FileName) then
   begin
+    FTreeNodes.Clear;
+    tvPaths.Items.Clear;
+
     FProject := TCCECoreProject.New(Value);
     FCoverage := TCCECoreCodeCoverage.New;
 
-    pgcWizard.ActivePage := tsFiles;
-    tvPaths.Items.Clear;
+    ListPaths;
+    tvPaths.ExpandAll;
+
     HideTabs;
     InitialValues;
-    tvPaths.ExpandAll;
-    SetColorButtons;
   end;
 end;
 
@@ -445,13 +442,13 @@ begin
   SelectPagePrevious;
 end;
 
-procedure TCCEWizardForms.RefreshAll;
+procedure TCCEWizardForms.SetCoverageUnits;
 var
   nodeSelect: TArray<TTreeNode>;
   i: Integer;
   unitFile: string;
 begin
-  FProject.Clear;
+  FCoverage.Clear;
   nodeSelect := tvPaths.CheckedNodes;
 
   for i := 0 to Pred(Length(nodeSelect)) do
@@ -459,7 +456,7 @@ begin
     unitFile := GetKeyNode(nodeSelect[i]);
     if FileExists(unitFile) then
     begin
-      FProject
+      FCoverage
         .AddUnit(unitFile)
         .AddPath(ExtractFilePath(unitFile));
     end;
@@ -487,7 +484,7 @@ procedure TCCEWizardForms.SelectPageNext;
 begin
   pgcWizard.SelectNextPage(True, False);
   btnNext.Enabled := pgcWizard.ActivePageIndex < (pgcWizard.PageCount - 1);
-  btnPrevious.Enabled := True;
+  btnPrevious.Enabled := pgcWizard.ActivePageIndex > 0; // (pgcWizard.PageCount - 1);
 
   setColorButtons;
 end;
@@ -515,15 +512,13 @@ end;
 
 procedure TCCEWizardForms.SetCoverage;
 begin
-  RefreshAll;
+  SetCoverageUnits;
 
   FCoverage
     .CodeCoverageFileName(edtCoverageExeName.Text)
     .ExeFileName(edtExeName.Text)
     .MapFileName(edtMapFileName.Text)
     .OutputReport(edtOutputReport.Text)
-    .Paths(FProject.ListAllPaths)
-    .Units(FProject.ListAllUnits)
     .GenerateHtml(chkHtmlReport.Checked)
     .GenerateXml(chkXmlReport.Checked)
     .GenerateEmma(chkEmmaReport.Checked)
@@ -535,7 +530,7 @@ procedure TCCEWizardForms.tvPathsDblClick(Sender: TObject);
 begin
   tvPaths.Items.BeginUpdate;
   try
-    CheckTreeView;
+    SetStateTreeView;
   finally
     tvPaths.Items.EndUpdate;
   end;
