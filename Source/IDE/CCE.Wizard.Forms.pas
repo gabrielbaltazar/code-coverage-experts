@@ -106,7 +106,7 @@ type
   public
     function Project(Value: IOTAProject): TCCEWizardForms;
 
-    constructor create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     { Public declarations }
   end;

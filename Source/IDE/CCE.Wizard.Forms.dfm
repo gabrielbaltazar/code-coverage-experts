@@ -25,6 +25,10 @@ object CCEWizardForms: TCCEWizardForms
     TabOrder = 0
     object tsFiles: TTabSheet
       Caption = 'Files'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnlContentFiles: TPanel
         Left = 0
         Top = 0
@@ -338,7 +342,7 @@ object CCEWizardForms: TCCEWizardForms
               Left = 15
               Top = 3
               Width = 166
-              Height = 27
+              Height = 21
               Margins.Left = 15
               Align = alLeft
               Caption = 'Code Coverage Settings'
@@ -348,7 +352,6 @@ object CCEWizardForms: TCCEWizardForms
               Font.Name = 'Segoe UI'
               Font.Style = []
               ParentFont = False
-              ExplicitHeight = 21
             end
           end
         end
@@ -958,7 +961,7 @@ object CCEWizardForms: TCCEWizardForms
     Left = 687
     Top = 8
     Bitmap = {
-      494C010106000800100010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010106000800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       00000000000000000000000000000000000088D6FD0066CCFF0066CCFF0066CC
       FF0066CCFF0066CCFF0066CCFF0066CCFF0066CCFF0066CCFF0066CCFF0066CC
