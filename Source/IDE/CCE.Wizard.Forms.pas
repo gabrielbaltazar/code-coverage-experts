@@ -59,7 +59,6 @@ type
     btnSelectExeName: TImage;
     btnSelectMapFile: TImage;
     btnOutputReport: TImage;
-    procedure FormCreate(Sender: TObject);
     procedure tvPathsDblClick(Sender: TObject);
     procedure imgRunClick(Sender: TObject);
     procedure imgSaveClick(Sender: TObject);
@@ -106,7 +105,9 @@ type
     procedure SelectPagePrevious;
     procedure SetColorButtons;
   public
-    constructor create(AOwner: TComponent; Project: IOTAProject); reintroduce;
+    function Project(Value: IOTAProject): TCCEWizardForms;
+
+    constructor create(AOwner: TComponent); override;
     destructor Destroy; override;
     { Public declarations }
   end;
@@ -265,27 +266,16 @@ begin
   CheckParents(nodeSelected);
 end;
 
-constructor TCCEWizardForms.create(AOwner: TComponent; Project: IOTAProject);
+constructor TCCEWizardForms.create(AOwner: TComponent);
 begin
-  inherited create(AOwner);
+  inherited;
   FTreeNodes := TDictionary<String, TTreeNode>.create;
-  FProject := TCCECoreProject.New(Project);
-  FCoverage := TCCECoreCodeCoverage.New;
 end;
 
 destructor TCCEWizardForms.Destroy;
 begin
   FTreeNodes.Free;
   inherited;
-end;
-
-procedure TCCEWizardForms.FormCreate(Sender: TObject);
-begin
-  HideTabs;
-  InitialValues;
-  tvPaths.ExpandAll;
-  SetColorButtons;
-
 end;
 
 function TCCEWizardForms.GetKeyNode(ANode: TTreeNode): String;
@@ -414,6 +404,25 @@ begin
   for i := 0 to Pred(Length( units )) do
     AddPathInTreeView(units[i]);
 
+end;
+
+function TCCEWizardForms.Project(Value: IOTAProject): TCCEWizardForms;
+begin
+  result := Self;
+  FTreeNodes.Clear;
+
+  if (not Assigned(FProject)) or (FProject.DprFileName <> Value.FileName) then
+  begin
+    FProject := TCCECoreProject.New(Value);
+    FCoverage := TCCECoreCodeCoverage.New;
+
+    pgcWizard.ActivePage := tsFiles;
+    tvPaths.Items.Clear;
+    HideTabs;
+    InitialValues;
+    tvPaths.ExpandAll;
+    SetColorButtons;
+  end;
 end;
 
 procedure TCCEWizardForms.btnCloseClick(Sender: TObject);

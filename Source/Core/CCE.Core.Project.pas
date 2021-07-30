@@ -32,6 +32,7 @@ type TCCECoreProject = class(TInterfacedObject, ICCEProject)
     function Clear: ICCEProject;
     function OutputPath: string;
     function ExeName: String;
+    function DprFileName: string;
     function MapFileName: string;
 
     function SetDetailedMapFile: ICCEProject;
@@ -107,6 +108,11 @@ begin
   FSelectedPaths.Free;
   FSelectedUnits.Free;
   inherited;
+end;
+
+function TCCECoreProject.DprFileName: string;
+begin
+  result := FProject.FileName;
 end;
 
 function TCCECoreProject.ExeName: String;

@@ -13,6 +13,7 @@ type
     function ProjectPath: string;
     function OutputPath: string;
     function ExeName: String; overload;
+    function DprFileName: string;
     function MapFileName: string; overload;
 
     function SetDetailedMapFile: ICCEProject;

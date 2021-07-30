@@ -13,7 +13,6 @@ object CCEWizardForms: TCCEWizardForms
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object pgcWizard: TPageControl
@@ -21,7 +20,7 @@ object CCEWizardForms: TCCEWizardForms
     Top = 35
     Width = 899
     Height = 455
-    ActivePage = tsTreeView
+    ActivePage = tsFiles
     Align = alClient
     TabOrder = 0
     object tsFiles: TTabSheet
@@ -955,7 +954,7 @@ object CCEWizardForms: TCCEWizardForms
     Left = 687
     Top = 8
     Bitmap = {
-      494C010106000800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010106000800080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       00000000000000000000000000000000000088D6FD0066CCFF0066CCFF0066CC
       FF0066CCFF0066CCFF0066CCFF0066CCFF0066CCFF0066CCFF0066CCFF0066CC

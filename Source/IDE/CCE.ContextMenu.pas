@@ -253,9 +253,11 @@ end;
 procedure TCCEContextMenuWizard.OnExecuteCodeCoverageWizard(const MenuContextList: IInterfaceList);
 begin
   if not Assigned(CCEWizardForms) then
-    CCEWizardForms := TCCEWizardForms.Create(nil, FProject);
+    CCEWizardForms := TCCEWizardForms.Create(nil);
 
-  CCEWizardForms.Show;
+  CCEWizardForms
+    .Project(FProject)
+    .Show;
 end;
 
 initialization
