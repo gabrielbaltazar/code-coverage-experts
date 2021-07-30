@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{86FED9F5-5C79-4F15-AC3B-E994EC56DB09}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="CodeCoverageExperts.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\..\FormacaoDelphiSenior\Tests\ProjetoBase\FormacaoTest\FormacaoERPTest.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CodeCoverageExperts">
+        <MSBuild Projects="CodeCoverageExperts.dproj"/>
+    </Target>
+    <Target Name="CodeCoverageExperts:Clean">
+        <MSBuild Projects="CodeCoverageExperts.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CodeCoverageExperts:Make">
+        <MSBuild Projects="CodeCoverageExperts.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FormacaoERPTest">
+        <MSBuild Projects="..\..\..\..\FormacaoDelphiSenior\Tests\ProjetoBase\FormacaoTest\FormacaoERPTest.dproj"/>
+    </Target>
+    <Target Name="FormacaoERPTest:Clean">
+        <MSBuild Projects="..\..\..\..\FormacaoDelphiSenior\Tests\ProjetoBase\FormacaoTest\FormacaoERPTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FormacaoERPTest:Make">
+        <MSBuild Projects="..\..\..\..\FormacaoDelphiSenior\Tests\ProjetoBase\FormacaoTest\FormacaoERPTest.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CodeCoverageExperts;FormacaoERPTest"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CodeCoverageExperts:Clean;FormacaoERPTest:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CodeCoverageExperts:Make;FormacaoERPTest:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

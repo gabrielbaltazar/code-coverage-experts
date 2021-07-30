@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{EE391CD5-C071-4EF1-80E2-50E699C70716}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="CodeCoverageExperts.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\..\..\FormacaoDelphiSenior\Tests\ProjetoBase\FormacaoTest\FormacaoERPTest.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="D:\Documentos\Embarcadero\Studio\Projects\TestTreeView\Project1.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CodeCoverageExperts">
+        <MSBuild Projects="CodeCoverageExperts.dproj"/>
+    </Target>
+    <Target Name="CodeCoverageExperts:Clean">
+        <MSBuild Projects="CodeCoverageExperts.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CodeCoverageExperts:Make">
+        <MSBuild Projects="CodeCoverageExperts.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FormacaoERPTest">
+        <MSBuild Projects="..\..\..\..\FormacaoDelphiSenior\Tests\ProjetoBase\FormacaoTest\FormacaoERPTest.dproj"/>
+    </Target>
+    <Target Name="FormacaoERPTest:Clean">
+        <MSBuild Projects="..\..\..\..\FormacaoDelphiSenior\Tests\ProjetoBase\FormacaoTest\FormacaoERPTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FormacaoERPTest:Make">
+        <MSBuild Projects="..\..\..\..\FormacaoDelphiSenior\Tests\ProjetoBase\FormacaoTest\FormacaoERPTest.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Project1">
+        <MSBuild Projects="D:\Documentos\Embarcadero\Studio\Projects\TestTreeView\Project1.dproj"/>
+    </Target>
+    <Target Name="Project1:Clean">
+        <MSBuild Projects="D:\Documentos\Embarcadero\Studio\Projects\TestTreeView\Project1.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Project1:Make">
+        <MSBuild Projects="D:\Documentos\Embarcadero\Studio\Projects\TestTreeView\Project1.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CodeCoverageExperts;FormacaoERPTest;Project1"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CodeCoverageExperts:Clean;FormacaoERPTest:Clean;Project1:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CodeCoverageExperts:Make;FormacaoERPTest:Make;Project1:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

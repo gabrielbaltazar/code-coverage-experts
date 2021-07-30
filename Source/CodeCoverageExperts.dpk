@@ -1,0 +1,48 @@
+package CodeCoverageExperts;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$DEFINE TESTINSIGHT}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  designide;
+
+contains
+  CCE.Wizard.Forms in 'IDE\CCE.Wizard.Forms.pas' {CCEWizardForms},
+  CCE.ContextMenu in 'IDE\CCE.ContextMenu.pas',
+  CCE.Constants in 'Core\CCE.Constants.pas',
+  CCE.Registry in 'IDE\CCE.Registry.pas',
+  CCE.Core.Project in 'Core\CCE.Core.Project.pas',
+  CCE.Core.Interfaces in 'Core\CCE.Core.Interfaces.pas',
+  CCE.Core.Utils in 'Core\CCE.Core.Utils.pas',
+  CCE.Core.CodeCoverage in 'Core\CCE.Core.CodeCoverage.pas',
+  CCE.Helpers.TreeView in 'Core\CCE.Helpers.TreeView.pas',
+  CCE.dpipes in 'Third\CCE.dpipes.pas',
+  CCE.dprocess in 'Third\CCE.dprocess.pas';
+
+end.
