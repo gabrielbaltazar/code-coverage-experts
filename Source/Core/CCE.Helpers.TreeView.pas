@@ -9,9 +9,11 @@ uses
   Vcl.Controls;
 
 const
-  UNCHECKED_INDEX = 0;
-  CHECKED_INDEX = 1;
-  GRAYED_INDEX = 2;
+  UNCHECKED_INDEX = 1;
+  CHECKED_INDEX = 2;
+  GRAYED_INDEX = 3;
+  FOLDER_INDEX = 4;
+  UNIT_INDEX = 5;
 
 type TCCEHelperTreeView = class helper for TTreeView
 
@@ -110,7 +112,7 @@ var
 begin
   for i := 0 to Pred(Items.Count) do
   begin
-    if Items[i].ImageIndex = CHECKED_INDEX then
+    if Items[i].StateIndex = CHECKED_INDEX then
     begin
       SetLength(result, Length(result) + 1);
       Result[Length(result) - 1] := Items[i];

@@ -30,7 +30,6 @@ type
     iltreeView: TImageList;
     Panel1: TPanel;
     imgSetDetailed: TImage;
-    ilMenu: TImageList;
     imgXml: TImage;
     imgTxt: TImage;
     imgHtml: TImage;
@@ -130,6 +129,21 @@ var
   pathParent: String;
   path: String;
   splittedPath: TArray<string>;
+
+  procedure SetImageIndex(ANode: TTreeNode; APath: String);
+  var
+    index: Integer;
+  begin
+    ANode.StateIndex := CHECKED_INDEX;
+    index := FOLDER_INDEX;
+    if APath.EndsWith('\') then
+      APath := Copy(APath, 1, APath.Length - 1);
+    if FileExists(APath) then
+      index := UNIT_INDEX;
+
+    ANode.ImageIndex := index;
+    ANode.SelectedIndex := index;
+  end;
 begin
   splittedPath := APath.Split(['\']);
 
@@ -147,8 +161,7 @@ begin
     if i = 0 then
     begin
       nodeParent := tvPaths.Items.AddChild(nil, text);
-      nodeParent.ImageIndex := CHECKED_INDEX;
-      nodeParent.SelectedIndex := CHECKED_INDEX;
+      SetImageIndex(nodeParent, path);
       FTreeNodes.Add(path, nodeParent);
       Continue;
     end;
@@ -158,8 +171,7 @@ begin
     if Assigned(nodeParent) then
     begin
       nodeParent := tvPaths.Items.AddChild(nodeParent, text);
-      nodeParent.ImageIndex := CHECKED_INDEX;
-      nodeParent.SelectedIndex := CHECKED_INDEX;
+      SetImageIndex(nodeParent, path);
       FTreeNodes.Add(path, nodeParent);
       Continue;
     end;
@@ -189,8 +201,7 @@ begin
 
   while childNode <> nil do
   begin
-    childNode.ImageIndex := AIndex;
-    childNode.SelectedIndex := AIndex;
+    childNode.StateIndex := AIndex;
     CheckChilds(childNode, AIndex);
 
     childNode := ANode.GetNextChild(childNode);
@@ -217,7 +228,7 @@ begin
   childNode := nodeParent.getFirstChild;
   while childNode <> nil do
   begin
-    index := childNode.ImageIndex;
+    index := childNode.StateIndex;
     hasCheck := (hasCheck) or (index = CHECKED_INDEX);
     hasUnCheck := (hasUnCheck) or (index = UNCHECKED_INDEX);
     hasGrayed := (hasGrayed) or (index = GRAYED_INDEX);
@@ -232,25 +243,25 @@ begin
   if hasCheck then
     index := CHECKED_INDEX;
 
-  nodeParent.ImageIndex := index;
-  nodeParent.SelectedIndex := index;
+  nodeParent.StateIndex := index;
   CheckParents(nodeParent);
 end;
 
 procedure TCCEWizardForms.checkTreeView;
 var
-  imageIndex: Integer;
+  stateIndex: Integer;
   nodeSelected: TTreeNode;
 begin
   nodeSelected := tvPaths.Selected;
-  imageIndex := UNCHECKED_INDEX;
-  if nodeSelected.ImageIndex = UNCHECKED_INDEX then
-    imageIndex := CHECKED_INDEX;
+  nodeSelected.Expanded := not nodeSelected.Expanded;
 
-  nodeSelected.ImageIndex := imageIndex;
-  nodeSelected.SelectedIndex := imageIndex;
+  stateIndex := UNCHECKED_INDEX;
+  if nodeSelected.StateIndex = UNCHECKED_INDEX then
+    stateIndex := CHECKED_INDEX;
 
-  CheckChilds(nodeSelected, imageIndex);
+  nodeSelected.StateIndex := stateIndex;
+
+  CheckChilds(nodeSelected, stateIndex);
   CheckParents(nodeSelected);
 end;
 
@@ -513,7 +524,12 @@ end;
 
 procedure TCCEWizardForms.tvPathsDblClick(Sender: TObject);
 begin
-  CheckTreeView;
+  tvPaths.Items.BeginUpdate;
+  try
+    CheckTreeView;
+  finally
+    tvPaths.Items.EndUpdate;
+  end;
 end;
 
 initialization

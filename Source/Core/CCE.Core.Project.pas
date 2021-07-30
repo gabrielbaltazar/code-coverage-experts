@@ -13,6 +13,9 @@ uses
   System.Types,
   System.Classes;
 
+const
+  TEST_INSIGHT = 'TESTINSIGHT';
+
 type TCCECoreProject = class(TInterfacedObject, ICCEProject)
 
   private
