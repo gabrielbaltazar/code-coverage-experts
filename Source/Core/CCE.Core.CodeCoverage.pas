@@ -43,6 +43,8 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function GetReportHTMLName: String;
     function GetReportXMLName: String;
     function GetCoverageLogFileName: string;
+
+    function ContainsIn(Value: String; AList: TList<String>): Boolean;
   protected
     function BasePath: string;
     function Clear: ICCECodeCoverage;
@@ -82,14 +84,14 @@ implementation
 function TCCECoreCodeCoverage.AddPath(Value: String): ICCECodeCoverage;
 begin
   result := Self;
-  if not FPaths.Contains(Value) then
+  if not ContainsIn(Value, FPaths) then
     FPaths.Add(Value);
 end;
 
 function TCCECoreCodeCoverage.AddUnit(Value: String): ICCECodeCoverage;
 begin
   result := Self;
-  if not FUnitsFiles.Contains(Value) then
+  if not ContainsIn(Value, FUnitsFiles) then
     FUnitsFiles.Add(Value);
 end;
 
@@ -132,6 +134,18 @@ function TCCECoreCodeCoverage.CodeCoverageFileName(Value: String): ICCECodeCover
 begin
   result := Self;
   FCodeCoverageFileName := Value;
+end;
+
+function TCCECoreCodeCoverage.ContainsIn(Value: String; AList: TList<String>): Boolean;
+var
+  listValue: string;
+begin
+  result := False;
+  for listValue in AList do
+  begin
+    if listValue.ToLower.Equals(Value.ToLower) then
+      Exit(True);
+  end;
 end;
 
 constructor TCCECoreCodeCoverage.create;
