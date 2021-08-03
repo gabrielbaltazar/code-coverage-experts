@@ -16,6 +16,7 @@ function AbsolutePathToRelative(const AbsolutePath, BasePath: string): string;
 
 procedure ExecuteAndWait(const APath, ACommand: string);
 procedure OpenFile(const AFileName: String);
+procedure OpenUrl(const Url: String);
 
 function PathCanonicalize(lpszDst: PChar; lpszSrc: PChar): LongBool; stdcall;
   external 'shlwapi.dll' name 'PathCanonicalizeW';
@@ -62,6 +63,11 @@ procedure OpenFile(const AFileName: String);
 begin
   if FileExists(AFileName) then
     ShellExecute(HInstance, 'open', PWideChar(AFileName), '', '', SW_SHOWNORMAL);
+end;
+
+procedure OpenUrl(const Url: String);
+begin
+  ShellExecute(HInstance, 'open', PWideChar( Url ), '', '', SW_SHOWNORMAL);
 end;
 
 end.

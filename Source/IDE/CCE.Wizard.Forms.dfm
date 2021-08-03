@@ -25,10 +25,6 @@ object CCEWizardForms: TCCEWizardForms
     TabOrder = 0
     object tsFiles: TTabSheet
       Caption = 'Files'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnlContentFiles: TPanel
         Left = 0
         Top = 0
@@ -342,7 +338,7 @@ object CCEWizardForms: TCCEWizardForms
               Left = 15
               Top = 3
               Width = 166
-              Height = 21
+              Height = 27
               Margins.Left = 15
               Align = alLeft
               Caption = 'Code Coverage Settings'
@@ -352,6 +348,7 @@ object CCEWizardForms: TCCEWizardForms
               Font.Name = 'Segoe UI'
               Font.Style = []
               ParentFont = False
+              ExplicitHeight = 21
             end
           end
         end

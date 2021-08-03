@@ -11,9 +11,10 @@ uses
   CCE.Core.Interfaces,
   CCE.Core.Project,
   CCE.Core.CodeCoverage,
+  CCE.Core.Utils,
   CCE.Helpers.TreeView,
   System.Generics.Collections, Vcl.CheckLst, Vcl.Menus, Vcl.Buttons,
-  System.ImageList, Vcl.ImgList, Vcl.Imaging.pngimage, Winapi.ShellAPI;
+  System.ImageList, Vcl.ImgList, Vcl.Imaging.pngimage;
 
 const
   COLOR_PRIMARY = $00FB7E15;
@@ -320,16 +321,12 @@ end;
 procedure TCCEWizardForms.imgFolderClick(Sender: TObject);
 begin
   SetCoverage;
-  ShellExecute(HInstance, 'open', PChar(FCoverage.BasePath), '', '', SW_SHOWNORMAL);
+  OpenFolder(FCoverage.BasePath);
 end;
 
 procedure TCCEWizardForms.imgGithubClick(Sender: TObject);
-var
-  url: PWideChar;
 begin
-  url := 'https://github.com/gabrielbaltazar/code-coverage-experts';
-
-  ShellExecute(HInstance, 'open', url, '', '', SW_SHOWNORMAL);
+  OpenUrl('https://github.com/gabrielbaltazar/code-coverage-experts');
 end;
 
 procedure TCCEWizardForms.imgHtmlClick(Sender: TObject);
