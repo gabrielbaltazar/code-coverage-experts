@@ -4,6 +4,7 @@ interface
 
 uses
   CCE.dprocess,
+  System.IOUtils,
   System.SysUtils,
   System.Types,
   Vcl.Forms,
@@ -28,16 +29,26 @@ function RelativeToAbsolutePath(const RelativePath, BasePath: string): string;
 var
   Dst: array[0..259] of char;
 begin
-  PathCanonicalize(@Dst[0], PChar(IncludeTrailingBackslash(BasePath) + RelativePath));
-  result := Dst;
+  result := RelativePath;
+  if TPath.IsRelativePath(RelativePath) then
+  begin
+    PathCanonicalize(@Dst[0], PChar(IncludeTrailingBackslash(BasePath) + RelativePath));
+    if Dst <> '' then
+      result := Dst;
+  end;
 end;
 
 function AbsolutePathToRelative(const AbsolutePath, BasePath: string): string;
 var
   Path: array[0..259] of char;
 begin
-  PathRelativePathTo(@Path[0], PChar(BasePath), FILE_ATTRIBUTE_DIRECTORY, PChar(AbsolutePath), 0);
-  result := Path;
+  result := AbsolutePath;
+  if not TPath.IsRelativePath(AbsolutePath) then
+  begin
+    PathRelativePathTo(@Path[0], PChar(BasePath), FILE_ATTRIBUTE_DIRECTORY, PChar(AbsolutePath), 0);
+    if Path <> '' then
+      result := Path;
+  end;
 end;
 
 procedure ExecuteAndWait(const APath, ACommand: string);
