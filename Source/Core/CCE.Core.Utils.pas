@@ -15,6 +15,7 @@ function RelativeToAbsolutePath(const RelativePath, BasePath: string): string;
 function AbsolutePathToRelative(const AbsolutePath, BasePath: string): string;
 
 procedure ExecuteAndWait(const APath, ACommand: string);
+procedure OpenFolder(const AFolderName: String);
 procedure OpenFile(const AFileName: String);
 procedure OpenUrl(const Url: String);
 
@@ -57,6 +58,11 @@ var
   output: AnsiString;
 begin
   RunCommandIndir(APath, 'cmd', ['/c', ACommand], output, [poNoConsole]);
+end;
+
+procedure OpenFolder(const AFolderName: String);
+begin
+  ShellExecute(HInstance, 'open', PChar(AFolderName), '', '', SW_SHOWNORMAL);
 end;
 
 procedure OpenFile(const AFileName: String);
