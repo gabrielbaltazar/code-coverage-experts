@@ -60,6 +60,17 @@ type
     btnSelectExeName: TImage;
     btnSelectMapFile: TImage;
     btnOutputReport: TImage;
+    tsIgnoredFiles: TTabSheet;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    Label1: TLabel;
+    lstIgnoreUnits: TListBox;
+    edtIgnoreUnit: TLabeledEdit;
+    pnlAddIgnoreUnit: TPanel;
+    imgAddIgnoreUnit: TImage;
+    pmIgnoreUnits: TPopupMenu;
+    Delete1: TMenuItem;
     procedure tvPathsDblClick(Sender: TObject);
     procedure imgRunClick(Sender: TObject);
     procedure imgSaveClick(Sender: TObject);
@@ -77,6 +88,8 @@ type
     procedure btnSelectMapFileClick(Sender: TObject);
     procedure btnOutputReportClick(Sender: TObject);
     procedure imgGithubClick(Sender: TObject);
+    procedure Delete1Click(Sender: TObject);
+    procedure imgAddIgnoreUnitClick(Sender: TObject);
   private
     FProject: ICCEProject;
     FCoverage: ICCECodeCoverage;
@@ -93,6 +106,7 @@ type
     procedure SetStateChilds(ANode: TTreeNode; AStateIndex: Integer);
     procedure SetStateParents(ANode: TTreeNode);
     procedure SetSelectedUnits;
+    procedure SetIgnoreUnits;
 
     procedure searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);
     procedure selectFolder(AComponent: TCustomEdit);
@@ -312,6 +326,11 @@ begin
   FTreeNodes := TDictionary<String, TTreeNode>.create;
 end;
 
+procedure TCCEWizardForms.Delete1Click(Sender: TObject);
+begin
+  lstIgnoreUnits.DeleteSelected;
+end;
+
 destructor TCCEWizardForms.Destroy;
 begin
   FTreeNodes.Free;
@@ -351,6 +370,15 @@ begin
     pgcWizard.Pages[i].TabVisible := False;
 
   SelectPageNext;
+end;
+
+procedure TCCEWizardForms.imgAddIgnoreUnitClick(Sender: TObject);
+var
+  LText: string;
+begin
+  LText := edtIgnoreUnit.Text;
+  if lstIgnoreUnits.Items.IndexOf(LText) < 0 then
+    lstIgnoreUnits.Items.Add(LText);
 end;
 
 procedure TCCEWizardForms.imgBuildClick(Sender: TObject);
@@ -458,6 +486,7 @@ begin
     InitialValues;
     SetCoverage(False);
     SetSelectedUnits;
+    SetIgnoreUnits;
   end;
 end;
 
@@ -490,6 +519,9 @@ begin
   FCoverage.Clear;
   nodeSelect := tvPaths.CheckedNodes;
 
+  for i := 0 to Pred(lstIgnoreUnits.Count) do
+    FCoverage.AddUnitIgnore(lstIgnoreUnits.Items[i]);
+
   for i := 0 to Pred(Length(nodeSelect)) do
   begin
     unitFile := GetKeyNode(nodeSelect[i]);
@@ -501,6 +533,15 @@ begin
     end;
   end;
 
+end;
+
+procedure TCCEWizardForms.SetIgnoreUnits;
+var
+  LIgnore: TArray<String>;
+begin
+  LIgnore := FCoverage.IgnoredUnits;
+  lstIgnoreUnits.Clear;
+  lstIgnoreUnits.Items.AddStrings(LIgnore);
 end;
 
 procedure TCCEWizardForms.searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);

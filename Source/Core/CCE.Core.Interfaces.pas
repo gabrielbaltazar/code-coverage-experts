@@ -41,8 +41,10 @@ type
     function UseRelativePath(Value: Boolean): ICCECodeCoverage;
 
     function IsInCovUnits(AUnitName: String): Boolean;
+    function IgnoredUnits: TArray<string>;
 
     function AddUnit(Value: String): ICCECodeCoverage;
+    function AddUnitIgnore(Value: String): ICCECodeCoverage;
     function AddPath(Value: String): ICCECodeCoverage;
 
     function Save: ICCECodeCoverage;

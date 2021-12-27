@@ -19,6 +19,7 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     FMapFileName: String;
     FOutputReport: String;
     FUnitsFiles: TList<string>;
+    FUnitsIgnore: TList<string>;
     FPaths: TList<string>;
     FGenerateHtml: Boolean;
     FGenerateXml: Boolean;
@@ -63,8 +64,10 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function UseRelativePath(Value: Boolean): ICCECodeCoverage;
 
     function IsInCovUnits(AUnitName: String): Boolean;
+    function IgnoredUnits: TArray<string>;
 
     function AddUnit(Value: String): ICCECodeCoverage;
+    function AddUnitIgnore(Value: String): ICCECodeCoverage;
     function AddPath(Value: String): ICCECodeCoverage;
 
     function Save: ICCECodeCoverage;
@@ -98,6 +101,19 @@ begin
     FUnitsFiles.Add(Value);
 end;
 
+function TCCECoreCodeCoverage.AddUnitIgnore(Value: String): ICCECodeCoverage;
+var
+  LValue: String;
+begin
+  result := Self;
+  LValue := Value;
+  if LValue.StartsWith('!') then
+    LValue := Copy(LValue, 2, LValue.Length);
+
+  if not FUnitsIgnore.Contains(LValue) then
+    FUnitsIgnore.Add(LValue);
+end;
+
 function TCCECoreCodeCoverage.BasePath: string;
 begin
   result := ExtractFilePath(FExeFileName);
@@ -107,6 +123,7 @@ function TCCECoreCodeCoverage.Clear: ICCECodeCoverage;
 begin
   result := Self;
   FUnitsFiles.Clear;
+  FUnitsIgnore.Clear;
   FPaths.Clear;
 end;
 
@@ -161,6 +178,7 @@ begin
   FUseRelativePath := True;
 
   FUnitsFiles := TList<String>.create;
+  FUnitsIgnore := TList<String>.create;
   FPaths := TList<String>.create;
 end;
 
@@ -168,6 +186,7 @@ destructor TCCECoreCodeCoverage.Destroy;
 begin
   FUnitsFiles.Free;
   FPaths.Free;
+  FUnitsIgnore.Free;
   inherited;
 end;
 
@@ -260,6 +279,9 @@ var
 begin
   with TStringList.Create do
   try
+    for i := 0 to Pred(FUnitsIgnore.Count) do
+      Add('!' + FUnitsIgnore[i]);
+
     for i := 0 to Pred(FUnitsFiles.Count) do
     begin
       unitFile := ExtractFileName(FUnitsFiles[i]);
@@ -338,6 +360,26 @@ end;
 function TCCECoreCodeCoverage.GetReportXMLName: String;
 begin
   result := FOutputReport + '\CodeCoverage_Summary.xml';
+end;
+
+function TCCECoreCodeCoverage.IgnoredUnits: TArray<string>;
+var
+  LUnits: TList<String>;
+  i: Integer;
+begin
+  LUnits := FileToList(FileUnitsName);
+  try
+    for i := 0 to Pred(LUnits.Count) do
+    begin
+      if LUnits[i].StartsWith('!') then
+      begin
+        SetLength(result, Length(result) + 1);
+        Result[Length(result) - 1] := Copy(LUnits[i], 2, LUnits[i].Length).Trim;
+      end;
+    end;
+  finally
+    LUnits.Free;
+  end;
 end;
 
 function TCCECoreCodeCoverage.IsInCovUnits(AUnitName: String): Boolean;
