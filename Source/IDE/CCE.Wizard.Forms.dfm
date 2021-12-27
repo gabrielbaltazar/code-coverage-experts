@@ -11,7 +11,6 @@ object CCEWizardForms: TCCEWizardForms
   Font.Height = -11
   Font.Name = 'Segoe UI'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
@@ -246,6 +245,7 @@ object CCEWizardForms: TCCEWizardForms
             EditLabel.Height = 13
             EditLabel.Caption = 'Delphi Test Project'
             TabOrder = 1
+            Text = ''
           end
           object edtMapFileName: TLabeledEdit
             Left = 11
@@ -256,6 +256,7 @@ object CCEWizardForms: TCCEWizardForms
             EditLabel.Height = 13
             EditLabel.Caption = 'Map File Project'
             TabOrder = 2
+            Text = ''
           end
           object edtOutputReport: TLabeledEdit
             Left = 11
@@ -266,6 +267,7 @@ object CCEWizardForms: TCCEWizardForms
             EditLabel.Height = 13
             EditLabel.Caption = 'Output Report'
             TabOrder = 3
+            Text = ''
           end
           object grpOutputFormat: TGroupBox
             Left = 10
@@ -357,10 +359,6 @@ object CCEWizardForms: TCCEWizardForms
     object tsTreeView: TTabSheet
       Caption = 'tsTreeView'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object tvPaths: TTreeView
         AlignWithMargins = True
         Left = 10

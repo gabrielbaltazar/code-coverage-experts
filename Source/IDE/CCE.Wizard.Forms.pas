@@ -14,7 +14,7 @@ uses
   CCE.Core.Utils,
   CCE.Helpers.TreeView,
   System.Generics.Collections, Vcl.CheckLst, Vcl.Menus, Vcl.Buttons,
-  System.ImageList, Vcl.ImgList, Vcl.Imaging.pngimage;
+  System.ImageList, Vcl.ImgList, Vcl.Imaging.pngimage, Vcl.Mask;
 
 const
   COLOR_PRIMARY = $00FB7E15;
