@@ -60,6 +60,17 @@ type
     btnSelectExeName: TImage;
     btnSelectMapFile: TImage;
     btnOutputReport: TImage;
+    tsIgnoredFiles: TTabSheet;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    Label1: TLabel;
+    lstIgnoreUnits: TListBox;
+    edtIgnoreUnit: TLabeledEdit;
+    pnlAddIgnoreUnit: TPanel;
+    imgAddIgnoreUnit: TImage;
+    pmIgnoreUnits: TPopupMenu;
+    Delete1: TMenuItem;
     procedure tvPathsDblClick(Sender: TObject);
     procedure imgRunClick(Sender: TObject);
     procedure imgSaveClick(Sender: TObject);
@@ -77,6 +88,8 @@ type
     procedure btnSelectMapFileClick(Sender: TObject);
     procedure btnOutputReportClick(Sender: TObject);
     procedure imgGithubClick(Sender: TObject);
+    procedure Delete1Click(Sender: TObject);
+    procedure imgAddIgnoreUnitClick(Sender: TObject);
   private
     FProject: ICCEProject;
     FCoverage: ICCECodeCoverage;
@@ -86,12 +99,14 @@ type
     procedure AddPathInTreeView(APath: String);
     function GetKeyNode(ANode: TTreeNode): String;
 
-    procedure SetCoverage;
+    procedure SetCoverage(ASetUnits: Boolean = True);
     procedure SetCoverageUnits;
 
     procedure SetStateTreeView;
     procedure SetStateChilds(ANode: TTreeNode; AStateIndex: Integer);
     procedure SetStateParents(ANode: TTreeNode);
+    procedure SetSelectedUnits;
+    procedure SetIgnoreUnits;
 
     procedure searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);
     procedure selectFolder(AComponent: TCustomEdit);
@@ -194,6 +209,45 @@ begin
   searchFile('Map File', 'map', edtMapFileName);
 end;
 
+procedure TCCEWizardForms.SetSelectedUnits;
+var
+  i: Integer;
+  LIndex: Integer;
+  LText: String;
+
+  function GetFullName(ANode: TTreeNode): String;
+  var
+    LParent: TTreeNode;
+  begin
+    result := ANode.Text;
+    LParent := ANode.Parent;
+    while LParent <> nil do
+    begin
+      result := LParent.Text + '\' + result;
+      LParent := LParent.Parent;
+    end;
+  end;
+begin
+  tvPaths.Items.BeginUpdate;
+  try
+    for i := 0 to Pred(tvPaths.Items.Count) do
+    begin
+      LText := GetFullName(tvPaths.Items[i]);
+      if FileExists(LText) then
+      begin
+        LIndex := UNCHECKED_INDEX;
+        if FCoverage.IsInCovUnits(LText) then
+          LIndex := CHECKED_INDEX;
+
+        tvPaths.Items[i].StateIndex := LIndex;
+        SetStateParents(tvPaths.Items[i]);
+      end;
+    end;
+  finally
+    tvPaths.Items.EndUpdate;
+  end;
+end;
+
 procedure TCCEWizardForms.SetStateChilds(ANode: TTreeNode; AStateIndex: Integer);
 var
   childNode: TTreeNode;
@@ -272,6 +326,11 @@ begin
   FTreeNodes := TDictionary<String, TTreeNode>.create;
 end;
 
+procedure TCCEWizardForms.Delete1Click(Sender: TObject);
+begin
+  lstIgnoreUnits.DeleteSelected;
+end;
+
 destructor TCCEWizardForms.Destroy;
 begin
   FTreeNodes.Free;
@@ -311,6 +370,15 @@ begin
     pgcWizard.Pages[i].TabVisible := False;
 
   SelectPageNext;
+end;
+
+procedure TCCEWizardForms.imgAddIgnoreUnitClick(Sender: TObject);
+var
+  LText: string;
+begin
+  LText := edtIgnoreUnit.Text;
+  if lstIgnoreUnits.Items.IndexOf(LText) < 0 then
+    lstIgnoreUnits.Items.Add(LText);
 end;
 
 procedure TCCEWizardForms.imgBuildClick(Sender: TObject);
@@ -403,7 +471,7 @@ function TCCEWizardForms.Project(Value: IOTAProject): TCCEWizardForms;
 begin
   result := Self;
 
-  if (not Assigned(FProject)) or (FProject.DprFileName <> Value.FileName) then
+//  if (not Assigned(FProject)) or (FProject.DprFileName <> Value.FileName) then
   begin
     FTreeNodes.Clear;
     tvPaths.Items.Clear;
@@ -416,6 +484,9 @@ begin
 
     HideTabs;
     InitialValues;
+    SetCoverage(False);
+    SetSelectedUnits;
+    SetIgnoreUnits;
   end;
 end;
 
@@ -448,6 +519,9 @@ begin
   FCoverage.Clear;
   nodeSelect := tvPaths.CheckedNodes;
 
+  for i := 0 to Pred(lstIgnoreUnits.Count) do
+    FCoverage.AddUnitIgnore(lstIgnoreUnits.Items[i]);
+
   for i := 0 to Pred(Length(nodeSelect)) do
   begin
     unitFile := GetKeyNode(nodeSelect[i]);
@@ -459,6 +533,15 @@ begin
     end;
   end;
 
+end;
+
+procedure TCCEWizardForms.SetIgnoreUnits;
+var
+  LIgnore: TArray<String>;
+begin
+  LIgnore := FCoverage.IgnoredUnits;
+  lstIgnoreUnits.Clear;
+  lstIgnoreUnits.Items.AddStrings(LIgnore);
 end;
 
 procedure TCCEWizardForms.searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);
@@ -507,9 +590,10 @@ begin
     btnPrevious.Color := COLOR_DISABLED;
 end;
 
-procedure TCCEWizardForms.SetCoverage;
+procedure TCCEWizardForms.SetCoverage(ASetUnits: Boolean = True);
 begin
-  SetCoverageUnits;
+  if ASetUnits then
+    SetCoverageUnits;
 
   FCoverage
     .CodeCoverageFileName(edtCoverageExeName.Text)
