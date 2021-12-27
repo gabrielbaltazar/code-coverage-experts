@@ -340,7 +340,7 @@ object CCEWizardForms: TCCEWizardForms
               Left = 15
               Top = 3
               Width = 166
-              Height = 27
+              Height = 21
               Margins.Left = 15
               Align = alLeft
               Caption = 'Code Coverage Settings'
@@ -350,7 +350,6 @@ object CCEWizardForms: TCCEWizardForms
               Font.Name = 'Segoe UI'
               Font.Style = []
               ParentFont = False
-              ExplicitHeight = 21
             end
           end
         end
@@ -429,7 +428,7 @@ object CCEWizardForms: TCCEWizardForms
               Left = 15
               Top = 3
               Width = 85
-              Height = 27
+              Height = 21
               Margins.Left = 15
               Align = alLeft
               Caption = 'Ignore Units'
@@ -439,7 +438,6 @@ object CCEWizardForms: TCCEWizardForms
               Font.Name = 'Segoe UI'
               Font.Style = []
               ParentFont = False
-              ExplicitHeight = 21
             end
           end
           object lstIgnoreUnits: TListBox

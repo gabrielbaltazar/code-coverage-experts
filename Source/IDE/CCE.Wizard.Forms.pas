@@ -480,7 +480,7 @@ begin
     FCoverage := TCCECoreCodeCoverage.New;
 
     ListPaths;
-    tvPaths.ExpandAll;
+    tvPaths.FullCollapse;
 
     HideTabs;
     InitialValues;
