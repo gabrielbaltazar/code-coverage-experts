@@ -40,6 +40,8 @@ type
     function GenerateLog(Value: Boolean): ICCECodeCoverage;
     function UseRelativePath(Value: Boolean): ICCECodeCoverage;
 
+    function IsInCovUnits(AUnitName: String): Boolean;
+
     function AddUnit(Value: String): ICCECodeCoverage;
     function AddPath(Value: String): ICCECodeCoverage;
 

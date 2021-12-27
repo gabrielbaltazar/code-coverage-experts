@@ -86,12 +86,13 @@ type
     procedure AddPathInTreeView(APath: String);
     function GetKeyNode(ANode: TTreeNode): String;
 
-    procedure SetCoverage;
+    procedure SetCoverage(ASetUnits: Boolean = True);
     procedure SetCoverageUnits;
 
     procedure SetStateTreeView;
     procedure SetStateChilds(ANode: TTreeNode; AStateIndex: Integer);
     procedure SetStateParents(ANode: TTreeNode);
+    procedure SetSelectedUnits;
 
     procedure searchFile(FilterText, FilterExt: string; AComponent: TCustomEdit);
     procedure selectFolder(AComponent: TCustomEdit);
@@ -192,6 +193,45 @@ end;
 procedure TCCEWizardForms.btnSelectMapFileClick(Sender: TObject);
 begin
   searchFile('Map File', 'map', edtMapFileName);
+end;
+
+procedure TCCEWizardForms.SetSelectedUnits;
+var
+  i: Integer;
+  LIndex: Integer;
+  LText: String;
+
+  function GetFullName(ANode: TTreeNode): String;
+  var
+    LParent: TTreeNode;
+  begin
+    result := ANode.Text;
+    LParent := ANode.Parent;
+    while LParent <> nil do
+    begin
+      result := LParent.Text + '\' + result;
+      LParent := LParent.Parent;
+    end;
+  end;
+begin
+  tvPaths.Items.BeginUpdate;
+  try
+    for i := 0 to Pred(tvPaths.Items.Count) do
+    begin
+      LText := GetFullName(tvPaths.Items[i]);
+      if FileExists(LText) then
+      begin
+        LIndex := UNCHECKED_INDEX;
+        if FCoverage.IsInCovUnits(LText) then
+          LIndex := CHECKED_INDEX;
+
+        tvPaths.Items[i].StateIndex := LIndex;
+        SetStateParents(tvPaths.Items[i]);
+      end;
+    end;
+  finally
+    tvPaths.Items.EndUpdate;
+  end;
 end;
 
 procedure TCCEWizardForms.SetStateChilds(ANode: TTreeNode; AStateIndex: Integer);
@@ -403,7 +443,7 @@ function TCCEWizardForms.Project(Value: IOTAProject): TCCEWizardForms;
 begin
   result := Self;
 
-  if (not Assigned(FProject)) or (FProject.DprFileName <> Value.FileName) then
+//  if (not Assigned(FProject)) or (FProject.DprFileName <> Value.FileName) then
   begin
     FTreeNodes.Clear;
     tvPaths.Items.Clear;
@@ -416,6 +456,8 @@ begin
 
     HideTabs;
     InitialValues;
+    SetCoverage(False);
+    SetSelectedUnits;
   end;
 end;
 
@@ -507,9 +549,10 @@ begin
     btnPrevious.Color := COLOR_DISABLED;
 end;
 
-procedure TCCEWizardForms.SetCoverage;
+procedure TCCEWizardForms.SetCoverage(ASetUnits: Boolean = True);
 begin
-  SetCoverageUnits;
+  if ASetUnits then
+    SetCoverageUnits;
 
   FCoverage
     .CodeCoverageFileName(edtCoverageExeName.Text)

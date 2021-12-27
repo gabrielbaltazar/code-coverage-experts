@@ -19,7 +19,7 @@ object CCEWizardForms: TCCEWizardForms
     Top = 35
     Width = 899
     Height = 455
-    ActivePage = tsFiles
+    ActivePage = tsTreeView
     Align = alClient
     TabOrder = 0
     object tsFiles: TTabSheet
@@ -340,7 +340,7 @@ object CCEWizardForms: TCCEWizardForms
               Left = 15
               Top = 3
               Width = 166
-              Height = 27
+              Height = 21
               Margins.Left = 15
               Align = alLeft
               Caption = 'Code Coverage Settings'
@@ -350,7 +350,6 @@ object CCEWizardForms: TCCEWizardForms
               Font.Name = 'Segoe UI'
               Font.Style = []
               ParentFont = False
-              ExplicitHeight = 21
             end
           end
         end

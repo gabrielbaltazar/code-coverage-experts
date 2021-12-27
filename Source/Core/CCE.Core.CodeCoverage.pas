@@ -26,6 +26,8 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     FGenerateLog: Boolean;
     FUseRelativePath: Boolean;
 
+    function FileToList(AFileName: String): TList<String>;
+
     function FilePathsName: String;
     function FileUnitsName: String;
     function FileCodeCoverageBat: string;
@@ -59,6 +61,8 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function GenerateEmma(Value: Boolean): ICCECodeCoverage;
     function GenerateLog(Value: Boolean): ICCECodeCoverage;
     function UseRelativePath(Value: Boolean): ICCECodeCoverage;
+
+    function IsInCovUnits(AUnitName: String): Boolean;
 
     function AddUnit(Value: String): ICCECodeCoverage;
     function AddPath(Value: String): ICCECodeCoverage;
@@ -190,6 +194,30 @@ begin
   result := ExtractFilePath(FExeFileName) + 'dcov_paths.lst';
 end;
 
+function TCCECoreCodeCoverage.FileToList(AFileName: String): TList<String>;
+var
+  LFile: TStrings;
+  i: Integer;
+begin
+  result := TList<String>.create;
+  try
+    LFile := TStringList.Create;
+    try
+      if FileExists(AFileName) then
+      begin
+        LFile.LoadFromFile(AFileName);
+        for i := 0 to Pred(LFile.Count) do
+          result.Add(LFile[i]);
+      end;
+    finally
+      LFile.Free;
+    end;
+  except
+    result.Free;
+    raise;
+  end;
+end;
+
 function TCCECoreCodeCoverage.FileUnitsName: String;
 begin
   result := ExtractFilePath(FExeFileName) + 'dcov_units.lst';
@@ -310,6 +338,30 @@ end;
 function TCCECoreCodeCoverage.GetReportXMLName: String;
 begin
   result := FOutputReport + '\CodeCoverage_Summary.xml';
+end;
+
+function TCCECoreCodeCoverage.IsInCovUnits(AUnitName: String): Boolean;
+var
+  LPaths: TList<String>;
+  LUnits: TList<String>;
+  LUnitName: String;
+  LPath: String;
+begin
+  result := False;
+  LPaths := FileToList(FilePathsName);
+  LUnits := FileToList(FileUnitsName);
+  try
+    LPath := ExtractFilePath(AUnitName);
+    if FUseRelativePath then
+      LPath := AbsolutePathToRelative(LPath, BasePath);
+
+    LUnitName := ExtractFileName(AUnitName);
+
+    result := (LPaths.Contains(LPath)) and (LUnits.Contains(LUnitName));       
+  finally
+    LPaths.Free;
+    LUnits.Free;
+  end;
 end;
 
 function TCCECoreCodeCoverage.MapFileName(Value: String): ICCECodeCoverage;
