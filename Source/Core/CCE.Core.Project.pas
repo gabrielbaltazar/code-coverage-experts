@@ -57,7 +57,7 @@ implementation
 
 procedure TCCECoreProject.AddPath(Value: String);
 begin
-  if not FPaths.Contains(Value) then
+  if (not FPaths.Contains(Value)) and (DirectoryExists(Value)) then
     FPaths.Add(Value);
 end;
 
@@ -219,6 +219,9 @@ var
   i: Integer;
   files: TStringDynArray;
 begin
+  if not DirectoryExists(Path) then
+    Exit;
+
   files := TDirectory.GetFiles(Path);
 
   for i := 0 to Pred(Length(files)) do

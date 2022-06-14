@@ -5,6 +5,9 @@ interface
 uses
   ToolsAPI,
   CCE.Constants,
+  CCE.Core.Interfaces,
+  CCE.Core.Project,
+  CCE.Core.CodeCoverage,
   CCE.Wizard.Forms,
   System.Classes,
   System.SysUtils;
@@ -19,6 +22,8 @@ type
     procedure Initialize(Project: IOTAProject);
 
     procedure OnExecuteCodeCoverageWizard(const MenuContextList: IInterfaceList);
+    procedure OnExecuteCodeCoverage(const MenuContextList: IInterfaceList);
+    procedure OnExecuteHTMLReport(const MenuContextList: IInterfaceList);
 
     function AddMenu(Caption: String;
                      Position: Integer;
@@ -224,7 +229,10 @@ begin
 
   Initialize(Project);
 
-  MenuList.Add(AddMenu(CCE_COVERAGE_CAPTION, CCE_COVERAGE_POSITION, '', OnExecuteCodeCoverageWizard));
+  MenuList.Add(AddMenu(CCE_COVERAGE_CAPTION, CCE_COVERAGE_POSITION));
+  MenuList.Add(AddMenu(CCE_COVERAGE_WIZARD_CAPTION, CCE_COVERAGE_WIZARD_POSITION, CCE_COVERAGE_CAPTION, OnExecuteCodeCoverageWizard));
+  MenuList.Add(AddMenu(CCE_COVERAGE_EXECUTE_CAPTION, CCE_COVERAGE_EXECUTE_POSITION, CCE_COVERAGE_CAPTION, OnExecuteCodeCoverage));
+  MenuList.Add(AddMenu(CCE_COVERAGE_HTML_CAPTION, CCE_COVERAGE_HTML_POSITION, CCE_COVERAGE_CAPTION, OnExecuteHTMLReport));
 end;
 
 function TCCEContextMenuWizard.AddMenu(Caption: String; Position: Integer;
@@ -250,6 +258,18 @@ begin
   result := Self.Create;
 end;
 
+procedure TCCEContextMenuWizard.OnExecuteCodeCoverage(const MenuContextList: IInterfaceList);
+var
+  LCCe: ICCECodeCoverage;
+  LProject: ICCEProject;
+begin
+  LProject := TCCECoreProject.New(FProject);
+  LCCe := TCCECoreCodeCoverage.New;
+  LCCe
+    .ExeFileName(LProject.ExeName)
+    .Execute;
+end;
+
 procedure TCCEContextMenuWizard.OnExecuteCodeCoverageWizard(const MenuContextList: IInterfaceList);
 begin
   if not Assigned(CCEWizardForms) then
@@ -258,6 +278,21 @@ begin
   CCEWizardForms
     .Project(FProject)
     .Show;
+end;
+
+procedure TCCEContextMenuWizard.OnExecuteHTMLReport(const MenuContextList: IInterfaceList);
+var
+  LCCe: ICCECodeCoverage;
+  LProject: ICCEProject;
+  LPathReport: String;
+begin
+  LProject := TCCECoreProject.New(FProject);
+  LPathReport := ExtractFilePath(LProject.ExeName) + 'report';
+  LCCe := TCCECoreCodeCoverage.New;
+  LCCe
+    .ExeFileName(LProject.ExeName)
+    .OutputReport(LPathReport)
+    .ShowHTMLReport;
 end;
 
 initialization

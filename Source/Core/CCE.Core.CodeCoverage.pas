@@ -8,7 +8,6 @@ uses
   System.SysUtils,
   System.Classes,
   System.Generics.Collections,
-  Winapi.ShellAPI,
   Winapi.Windows,
   Vcl.Dialogs;
 
@@ -20,12 +19,15 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     FMapFileName: String;
     FOutputReport: String;
     FUnitsFiles: TList<string>;
+    FUnitsIgnore: TList<string>;
     FPaths: TList<string>;
     FGenerateHtml: Boolean;
     FGenerateXml: Boolean;
     FGenerateEmma: Boolean;
     FGenerateLog: Boolean;
     FUseRelativePath: Boolean;
+
+    function FileToList(AFileName: String): TList<String>;
 
     function FilePathsName: String;
     function FileUnitsName: String;
@@ -43,6 +45,8 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function GetReportHTMLName: String;
     function GetReportXMLName: String;
     function GetCoverageLogFileName: string;
+
+    function ContainsIn(Value: String; AList: TList<String>): Boolean;
   protected
     function BasePath: string;
     function Clear: ICCECodeCoverage;
@@ -59,7 +63,11 @@ type TCCECoreCodeCoverage = class(TInterfacedObject, ICCECodeCoverage)
     function GenerateLog(Value: Boolean): ICCECodeCoverage;
     function UseRelativePath(Value: Boolean): ICCECodeCoverage;
 
+    function IsInCovUnits(AUnitName: String): Boolean;
+    function IgnoredUnits: TArray<string>;
+
     function AddUnit(Value: String): ICCECodeCoverage;
+    function AddUnitIgnore(Value: String): ICCECodeCoverage;
     function AddPath(Value: String): ICCECodeCoverage;
 
     function Save: ICCECodeCoverage;
@@ -82,15 +90,28 @@ implementation
 function TCCECoreCodeCoverage.AddPath(Value: String): ICCECodeCoverage;
 begin
   result := Self;
-  if not FPaths.Contains(Value) then
+  if not ContainsIn(Value, FPaths) then
     FPaths.Add(Value);
 end;
 
 function TCCECoreCodeCoverage.AddUnit(Value: String): ICCECodeCoverage;
 begin
   result := Self;
-  if not FUnitsFiles.Contains(Value) then
+  if not ContainsIn(Value, FUnitsFiles) then
     FUnitsFiles.Add(Value);
+end;
+
+function TCCECoreCodeCoverage.AddUnitIgnore(Value: String): ICCECodeCoverage;
+var
+  LValue: String;
+begin
+  result := Self;
+  LValue := Value;
+  if LValue.StartsWith('!') then
+    LValue := Copy(LValue, 2, LValue.Length);
+
+  if not FUnitsIgnore.Contains(LValue) then
+    FUnitsIgnore.Add(LValue);
 end;
 
 function TCCECoreCodeCoverage.BasePath: string;
@@ -102,6 +123,7 @@ function TCCECoreCodeCoverage.Clear: ICCECodeCoverage;
 begin
   result := Self;
   FUnitsFiles.Clear;
+  FUnitsIgnore.Clear;
   FPaths.Clear;
 end;
 
@@ -134,6 +156,18 @@ begin
   FCodeCoverageFileName := Value;
 end;
 
+function TCCECoreCodeCoverage.ContainsIn(Value: String; AList: TList<String>): Boolean;
+var
+  listValue: string;
+begin
+  result := False;
+  for listValue in AList do
+  begin
+    if listValue.ToLower.Equals(Value.ToLower) then
+      Exit(True);
+  end;
+end;
+
 constructor TCCECoreCodeCoverage.create;
 begin
   FCodeCoverageFileName := 'CodeCoverage.exe';
@@ -144,6 +178,7 @@ begin
   FUseRelativePath := True;
 
   FUnitsFiles := TList<String>.create;
+  FUnitsIgnore := TList<String>.create;
   FPaths := TList<String>.create;
 end;
 
@@ -151,6 +186,7 @@ destructor TCCECoreCodeCoverage.Destroy;
 begin
   FUnitsFiles.Free;
   FPaths.Free;
+  FUnitsIgnore.Free;
   inherited;
 end;
 
@@ -175,6 +211,30 @@ end;
 function TCCECoreCodeCoverage.FilePathsName: String;
 begin
   result := ExtractFilePath(FExeFileName) + 'dcov_paths.lst';
+end;
+
+function TCCECoreCodeCoverage.FileToList(AFileName: String): TList<String>;
+var
+  LFile: TStrings;
+  i: Integer;
+begin
+  result := TList<String>.create;
+  try
+    LFile := TStringList.Create;
+    try
+      if FileExists(AFileName) then
+      begin
+        LFile.LoadFromFile(AFileName);
+        for i := 0 to Pred(LFile.Count) do
+          result.Add(LFile[i]);
+      end;
+    finally
+      LFile.Free;
+    end;
+  except
+    result.Free;
+    raise;
+  end;
 end;
 
 function TCCECoreCodeCoverage.FileUnitsName: String;
@@ -219,6 +279,9 @@ var
 begin
   with TStringList.Create do
   try
+    for i := 0 to Pred(FUnitsIgnore.Count) do
+      Add('!' + FUnitsIgnore[i]);
+
     for i := 0 to Pred(FUnitsFiles.Count) do
     begin
       unitFile := ExtractFileName(FUnitsFiles[i]);
@@ -297,6 +360,50 @@ end;
 function TCCECoreCodeCoverage.GetReportXMLName: String;
 begin
   result := FOutputReport + '\CodeCoverage_Summary.xml';
+end;
+
+function TCCECoreCodeCoverage.IgnoredUnits: TArray<string>;
+var
+  LUnits: TList<String>;
+  i: Integer;
+begin
+  LUnits := FileToList(FileUnitsName);
+  try
+    for i := 0 to Pred(LUnits.Count) do
+    begin
+      if LUnits[i].StartsWith('!') then
+      begin
+        SetLength(result, Length(result) + 1);
+        Result[Length(result) - 1] := Copy(LUnits[i], 2, LUnits[i].Length).Trim;
+      end;
+    end;
+  finally
+    LUnits.Free;
+  end;
+end;
+
+function TCCECoreCodeCoverage.IsInCovUnits(AUnitName: String): Boolean;
+var
+  LPaths: TList<String>;
+  LUnits: TList<String>;
+  LUnitName: String;
+  LPath: String;
+begin
+  result := False;
+  LPaths := FileToList(FilePathsName);
+  LUnits := FileToList(FileUnitsName);
+  try
+    LPath := ExtractFilePath(AUnitName);
+    if FUseRelativePath then
+      LPath := AbsolutePathToRelative(LPath, BasePath);
+
+    LUnitName := ExtractFileName(AUnitName);
+
+    result := (LPaths.Contains(LPath)) and (LUnits.Contains(LUnitName));       
+  finally
+    LPaths.Free;
+    LUnits.Free;
+  end;
 end;
 
 function TCCECoreCodeCoverage.MapFileName(Value: String): ICCECodeCoverage;

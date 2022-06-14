@@ -3,37 +3,32 @@ object CCEWizardForms: TCCEWizardForms
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'Code Coverage Experts'
-  ClientHeight = 531
-  ClientWidth = 899
+  ClientHeight = 541
+  ClientWidth = 900
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Segoe UI'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
   object pgcWizard: TPageControl
     Left = 0
     Top = 35
-    Width = 899
-    Height = 455
+    Width = 900
+    Height = 465
     ActivePage = tsFiles
     Align = alClient
     TabOrder = 0
     object tsFiles: TTabSheet
       Caption = 'Files'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnlContentFiles: TPanel
         Left = 0
         Top = 0
-        Width = 891
-        Height = 427
+        Width = 892
+        Height = 437
         Align = alClient
         BevelOuter = bvNone
         Color = 16381684
@@ -43,8 +38,8 @@ object CCEWizardForms: TCCEWizardForms
           AlignWithMargins = True
           Left = 20
           Top = 20
-          Width = 851
-          Height = 387
+          Width = 852
+          Height = 397
           Margins.Left = 20
           Margins.Top = 20
           Margins.Right = 20
@@ -250,6 +245,7 @@ object CCEWizardForms: TCCEWizardForms
             EditLabel.Height = 13
             EditLabel.Caption = 'Delphi Test Project'
             TabOrder = 1
+            Text = ''
           end
           object edtMapFileName: TLabeledEdit
             Left = 11
@@ -260,6 +256,7 @@ object CCEWizardForms: TCCEWizardForms
             EditLabel.Height = 13
             EditLabel.Caption = 'Map File Project'
             TabOrder = 2
+            Text = ''
           end
           object edtOutputReport: TLabeledEdit
             Left = 11
@@ -270,6 +267,7 @@ object CCEWizardForms: TCCEWizardForms
             EditLabel.Height = 13
             EditLabel.Caption = 'Output Report'
             TabOrder = 3
+            Text = ''
           end
           object grpOutputFormat: TGroupBox
             Left = 10
@@ -330,7 +328,7 @@ object CCEWizardForms: TCCEWizardForms
           object pnlTitle: TPanel
             Left = 0
             Top = 0
-            Width = 851
+            Width = 852
             Height = 33
             Align = alTop
             BevelOuter = bvNone
@@ -360,16 +358,12 @@ object CCEWizardForms: TCCEWizardForms
     object tsTreeView: TTabSheet
       Caption = 'tsTreeView'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object tvPaths: TTreeView
         AlignWithMargins = True
         Left = 10
         Top = 10
-        Width = 871
-        Height = 407
+        Width = 872
+        Height = 417
         Margins.Left = 10
         Margins.Top = 10
         Margins.Right = 10
@@ -388,11 +382,136 @@ object CCEWizardForms: TCCEWizardForms
         OnDblClick = tvPathsDblClick
       end
     end
+    object tsIgnoredFiles: TTabSheet
+      Caption = 'tsIgnoredFiles'
+      ImageIndex = 2
+      object Panel2: TPanel
+        Left = 0
+        Top = 0
+        Width = 892
+        Height = 437
+        Align = alClient
+        BevelOuter = bvNone
+        Color = 16381684
+        ParentBackground = False
+        TabOrder = 0
+        object Panel3: TPanel
+          AlignWithMargins = True
+          Left = 20
+          Top = 20
+          Width = 852
+          Height = 397
+          Margins.Left = 20
+          Margins.Top = 20
+          Margins.Right = 20
+          Margins.Bottom = 20
+          Align = alClient
+          BevelOuter = bvNone
+          Color = clWhite
+          ParentBackground = False
+          TabOrder = 0
+          DesignSize = (
+            852
+            397)
+          object Panel4: TPanel
+            Left = 0
+            Top = 0
+            Width = 852
+            Height = 33
+            Align = alTop
+            BevelOuter = bvNone
+            Color = 16481813
+            ParentBackground = False
+            TabOrder = 0
+            object Label1: TLabel
+              AlignWithMargins = True
+              Left = 15
+              Top = 3
+              Width = 85
+              Height = 21
+              Margins.Left = 15
+              Align = alLeft
+              Caption = 'Ignore Units'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWhite
+              Font.Height = -16
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+            end
+          end
+          object lstIgnoreUnits: TListBox
+            Left = 18
+            Top = 99
+            Width = 608
+            Height = 288
+            Anchors = [akLeft, akTop, akBottom]
+            ItemHeight = 13
+            Items.Strings = (
+              '')
+            MultiSelect = True
+            PopupMenu = pmIgnoreUnits
+            TabOrder = 1
+          end
+          object edtIgnoreUnit: TLabeledEdit
+            Left = 18
+            Top = 69
+            Width = 607
+            Height = 21
+            EditLabel.Width = 59
+            EditLabel.Height = 13
+            EditLabel.Caption = 'Ignore Unit'
+            TabOrder = 2
+            Text = ''
+          end
+          object pnlAddIgnoreUnit: TPanel
+            Left = 631
+            Top = 66
+            Width = 34
+            Height = 27
+            Cursor = crHandPoint
+            BevelOuter = bvNone
+            Color = 16481813
+            DragCursor = crHandPoint
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWhite
+            Font.Height = -11
+            Font.Name = 'Segoe UI'
+            Font.Style = []
+            ParentBackground = False
+            ParentFont = False
+            TabOrder = 3
+            OnClick = btnNextClick
+            object imgAddIgnoreUnit: TImage
+              Left = 0
+              Top = 0
+              Width = 34
+              Height = 27
+              Align = alClient
+              Center = True
+              Picture.Data = {
+                0954506E67496D61676589504E470D0A1A0A0000000D49484452000000300000
+                003008060000005702F987000000097048597300000B1300000B1301009A9C18
+                0000005F4944415478DAEDD3B10D00200C0341D87F689881C60ED27D1D095FC1
+                5E9FB7DB0300DA0300DA0300DA0300DA0326034EE22D000000000000008010E0
+                3CDCC6B601000401AF8DFBC40000000000000000414024807600ED00DA01B4FB
+                1E700193791C3139E76DA70000000049454E44AE426082}
+              Proportional = True
+              OnClick = imgAddIgnoreUnitClick
+              ExplicitLeft = 8
+              ExplicitTop = 8
+              ExplicitWidth = 105
+              ExplicitHeight = 105
+            end
+          end
+        end
+      end
+    end
   end
   object pnlBottom: TPanel
     Left = 0
-    Top = 490
-    Width = 899
+    Top = 500
+    Width = 900
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
@@ -442,7 +561,7 @@ object CCEWizardForms: TCCEWizardForms
     end
     object btnClose: TPanel
       AlignWithMargins = True
-      Left = 785
+      Left = 786
       Top = 7
       Width = 89
       Height = 27
@@ -469,7 +588,7 @@ object CCEWizardForms: TCCEWizardForms
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 899
+    Width = 900
     Height = 35
     Align = alTop
     BevelOuter = bvNone
@@ -813,7 +932,7 @@ object CCEWizardForms: TCCEWizardForms
     end
     object imgGithub: TImage
       AlignWithMargins = True
-      Left = 851
+      Left = 852
       Top = 0
       Width = 33
       Height = 35
@@ -1231,5 +1350,13 @@ object CCEWizardForms: TCCEWizardForms
       3FFC3FFC3FDC1C383FFC3FFC3FFC0FF03FFC3FFC3FFC87E13FFC3FFC1FF88001
       000000008001C00300000000C003F00F00000000000000000000000000000000
       000000000000}
+  end
+  object pmIgnoreUnits: TPopupMenu
+    Left = 720
+    Top = 7
+    object Delete1: TMenuItem
+      Caption = 'Delete'
+      OnClick = Delete1Click
+    end
   end
 end
