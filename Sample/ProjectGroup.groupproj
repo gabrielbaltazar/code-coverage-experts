@@ -3,6 +3,9 @@
         <ProjectGuid>{60878318-6802-4DD9-B2BC-83C66C91BFB1}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
+        <Projects Include="..\Source\CodeCoverageExperts.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="VCLProject\VCLProject.dproj">
             <Dependencies/>
         </Projects>
@@ -17,6 +20,15 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
+    <Target Name="CodeCoverageExperts">
+        <MSBuild Projects="..\Source\CodeCoverageExperts.dproj"/>
+    </Target>
+    <Target Name="CodeCoverageExperts:Clean">
+        <MSBuild Projects="..\Source\CodeCoverageExperts.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CodeCoverageExperts:Make">
+        <MSBuild Projects="..\Source\CodeCoverageExperts.dproj" Targets="Make"/>
+    </Target>
     <Target Name="VCLProject">
         <MSBuild Projects="VCLProject\VCLProject.dproj"/>
     </Target>
@@ -36,13 +48,13 @@
         <MSBuild Projects="TestProject\TestProject.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="VCLProject;TestProject"/>
+        <CallTarget Targets="CodeCoverageExperts;VCLProject;TestProject"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="VCLProject:Clean;TestProject:Clean"/>
+        <CallTarget Targets="CodeCoverageExperts:Clean;VCLProject:Clean;TestProject:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="VCLProject:Make;TestProject:Make"/>
+        <CallTarget Targets="CodeCoverageExperts:Make;VCLProject:Make;TestProject:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
