@@ -67,3 +67,7 @@ __recovery/
 
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
+*.res
+*.log
+Sample/TestProject/Bin/report/
+Sample/TestProject/Bin/dunitx-results.xml

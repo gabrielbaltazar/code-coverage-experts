@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{60878318-6802-4DD9-B2BC-83C66C91BFB1}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="..\Source\CodeCoverageExperts.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="VCLProject\VCLProject.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="TestProject\TestProject.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CodeCoverageExperts">
+        <MSBuild Projects="..\Source\CodeCoverageExperts.dproj"/>
+    </Target>
+    <Target Name="CodeCoverageExperts:Clean">
+        <MSBuild Projects="..\Source\CodeCoverageExperts.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CodeCoverageExperts:Make">
+        <MSBuild Projects="..\Source\CodeCoverageExperts.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="VCLProject">
+        <MSBuild Projects="VCLProject\VCLProject.dproj"/>
+    </Target>
+    <Target Name="VCLProject:Clean">
+        <MSBuild Projects="VCLProject\VCLProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VCLProject:Make">
+        <MSBuild Projects="VCLProject\VCLProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="TestProject">
+        <MSBuild Projects="TestProject\TestProject.dproj"/>
+    </Target>
+    <Target Name="TestProject:Clean">
+        <MSBuild Projects="TestProject\TestProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TestProject:Make">
+        <MSBuild Projects="TestProject\TestProject.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CodeCoverageExperts;VCLProject;TestProject"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CodeCoverageExperts:Clean;VCLProject:Clean;TestProject:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CodeCoverageExperts:Make;VCLProject:Make;TestProject:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
