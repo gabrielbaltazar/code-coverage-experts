@@ -140,7 +140,7 @@ begin
     result := result + '-html ';
 
   if FGenerateXml then
-    result := result + '-xml';
+    result := result + '-xml -xmllines';
 
   result := Format(Result, [FCodeCoverageFileName,
                             GetExeName,
