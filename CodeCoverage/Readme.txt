@@ -1,1 +1,1 @@
-https://sourceforge.net/projects/delphicodecoverage/files/latest/download
+https://github.com/DelphiCodeCoverage/DelphiCodeCoverage/releases/download/1.0.15/DelphiCodeCoverage_1_0_15.zip
