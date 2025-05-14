@@ -34,16 +34,16 @@ requires
   designide;
 
 contains
-  CCE.Wizard.Forms in 'IDE\CCE.Wizard.Forms.pas' {CCEWizardForms},
-  CCE.ContextMenu in 'IDE\CCE.ContextMenu.pas',
-  CCE.Constants in 'Core\CCE.Constants.pas',
-  CCE.Registry in 'IDE\CCE.Registry.pas',
-  CCE.Core.Project in 'Core\CCE.Core.Project.pas',
-  CCE.Core.Interfaces in 'Core\CCE.Core.Interfaces.pas',
-  CCE.Core.Utils in 'Core\CCE.Core.Utils.pas',
-  CCE.Core.CodeCoverage in 'Core\CCE.Core.CodeCoverage.pas',
-  CCE.Helpers.TreeView in 'Core\CCE.Helpers.TreeView.pas',
-  CCE.dpipes in 'Third\CCE.dpipes.pas',
-  CCE.dprocess in 'Third\CCE.dprocess.pas';
+  CCE.Constants in '..\Src\Core\CCE.Constants.pas',
+  CCE.Core.CodeCoverage in '..\Src\Core\CCE.Core.CodeCoverage.pas',
+  CCE.Core.Interfaces in '..\Src\Core\CCE.Core.Interfaces.pas',
+  CCE.Core.Project in '..\Src\Core\CCE.Core.Project.pas',
+  CCE.Core.Utils in '..\Src\Core\CCE.Core.Utils.pas',
+  CCE.Helpers.TreeView in '..\Src\Core\CCE.Helpers.TreeView.pas',
+  CCE.ContextMenu in '..\Src\IDE\CCE.ContextMenu.pas',
+  CCE.Pkg.Registry in 'CCE.Pkg.Registry.pas',
+  CCE.Wizard.Forms in '..\Src\IDE\CCE.Wizard.Forms.pas' {CCEWizardForms},
+  CCE.dpipes in '..\Src\Third\CCE.dpipes.pas',
+  CCE.dprocess in '..\Src\Third\CCE.dprocess.pas';
 
 end.

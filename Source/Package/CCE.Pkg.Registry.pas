@@ -1,4 +1,4 @@
-unit CCE.Registry;
+unit CCE.Pkg.Registry;
 
 interface
 
