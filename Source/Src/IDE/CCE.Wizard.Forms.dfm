@@ -12,7 +12,6 @@ object CCEWizardForms: TCCEWizardForms
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poScreenCenter
-  PixelsPerInch = 96
   TextHeight = 13
   object pgcWizard: TPageControl
     Left = 0
@@ -273,7 +272,7 @@ object CCEWizardForms: TCCEWizardForms
             Left = 10
             Top = 239
             Width = 383
-            Height = 139
+            Height = 155
             Caption = 'Output'
             TabOrder = 4
             object chkXmlReport: TCheckBox
@@ -288,7 +287,7 @@ object CCEWizardForms: TCCEWizardForms
             end
             object chkHtmlReport: TCheckBox
               Left = 16
-              Top = 47
+              Top = 46
               Width = 393
               Height = 17
               Caption = 'HTML coverage output as '#39'CodeCoverage_Summary.html'#39' (-html)'
@@ -298,7 +297,7 @@ object CCEWizardForms: TCCEWizardForms
             end
             object chkEmmaReport: TCheckBox
               Left = 16
-              Top = 70
+              Top = 67
               Width = 393
               Height = 17
               Caption = 'EMMA coverage output as '#39'coverage.es'#39' (-emma)'
@@ -306,7 +305,7 @@ object CCEWizardForms: TCCEWizardForms
             end
             object chkLog: TCheckBox
               Left = 16
-              Top = 93
+              Top = 88
               Width = 105
               Height = 17
               Caption = 'Generate Log'
@@ -316,13 +315,23 @@ object CCEWizardForms: TCCEWizardForms
             end
             object chkUseRelativePath: TCheckBox
               Left = 16
-              Top = 116
+              Top = 109
               Width = 129
               Height = 17
               Caption = 'Use Relative Path'
               Checked = True
               State = cbChecked
               TabOrder = 4
+            end
+            object ChkJacoco: TCheckBox
+              Left = 16
+              Top = 130
+              Width = 129
+              Height = 17
+              Caption = 'Jacoco'
+              Checked = True
+              State = cbChecked
+              TabOrder = 5
             end
           end
           object pnlTitle: TPanel
@@ -340,7 +349,7 @@ object CCEWizardForms: TCCEWizardForms
               Left = 15
               Top = 3
               Width = 166
-              Height = 21
+              Height = 27
               Margins.Left = 15
               Align = alLeft
               Caption = 'Code Coverage Settings'
@@ -350,6 +359,7 @@ object CCEWizardForms: TCCEWizardForms
               Font.Name = 'Segoe UI'
               Font.Style = []
               ParentFont = False
+              ExplicitHeight = 21
             end
           end
         end
@@ -428,7 +438,7 @@ object CCEWizardForms: TCCEWizardForms
               Left = 15
               Top = 3
               Width = 85
-              Height = 21
+              Height = 27
               Margins.Left = 15
               Align = alLeft
               Caption = 'Ignore Units'
@@ -438,6 +448,7 @@ object CCEWizardForms: TCCEWizardForms
               Font.Name = 'Segoe UI'
               Font.Style = []
               ParentFont = False
+              ExplicitHeight = 21
             end
           end
           object lstIgnoreUnits: TListBox

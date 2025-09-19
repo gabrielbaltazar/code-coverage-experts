@@ -39,6 +39,7 @@ type
     function GenerateEmma(AValue: Boolean): ICCECodeCoverage;
     function GenerateLog(AValue: Boolean): ICCECodeCoverage;
     function UseRelativePath(AValue: Boolean): ICCECodeCoverage;
+    function Jacoco(AValue: Boolean): ICCECodeCoverage;
 
     function IsInCovUnits(AUnitName: string): Boolean;
     function IgnoredUnits: TArray<string>;

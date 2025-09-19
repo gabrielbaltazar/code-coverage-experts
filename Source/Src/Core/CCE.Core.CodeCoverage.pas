@@ -26,6 +26,7 @@ type
     FGenerateEmma: Boolean;
     FGenerateLog: Boolean;
     FUseRelativePath: Boolean;
+    FJacoco: Boolean;
 
     function FileToList(AFileName: string): TList<string>;
 
@@ -62,6 +63,7 @@ type
     function GenerateEmma(Value: Boolean): ICCECodeCoverage;
     function GenerateLog(Value: Boolean): ICCECodeCoverage;
     function UseRelativePath(Value: Boolean): ICCECodeCoverage;
+    function Jacoco(AValue: Boolean): ICCECodeCoverage;
 
     function IsInCovUnits(AUnitName: string): Boolean;
     function IgnoredUnits: TArray<string>;
@@ -76,9 +78,8 @@ type
     function ShowHTMLReport: ICCECodeCoverage;
     function ShowXMLReport: ICCECodeCoverage;
     function ShowLogCoverage: ICCECodeCoverage;
-
   public
-    constructor create;
+    constructor Create;
     class function New: ICCECodeCoverage;
     destructor Destroy; override;
 end;
@@ -140,14 +141,12 @@ begin
     Result := Result + '-html ';
 
   if FGenerateXml then
-    Result := Result + '-xml -xmllines';
+    Result := Result + '-xml -xmllines ';
 
-  Result := Format(Result, [FCodeCoverageFileName,
-                            GetExeName,
-                            GetMapName,
-                            GetFileUnits,
-                            GetFilePaths,
-                            GetOutputReport]);
+  if FJacoco then
+    Result := Result + 'jacoco';
+
+  Result := Format(Result, [FCodeCoverageFileName, GetExeName, GetMapName, GetFileUnits, GetFilePaths, GetOutputReport]).Trim;
 end;
 
 function TCCECoreCodeCoverage.CodeCoverageFileName(Value: string): ICCECodeCoverage;
@@ -168,7 +167,7 @@ begin
   end;
 end;
 
-constructor TCCECoreCodeCoverage.create;
+constructor TCCECoreCodeCoverage.Create;
 begin
   FCodeCoverageFileName := 'CodeCoverage.exe';
   FGenerateXml := True;
@@ -176,6 +175,7 @@ begin
   FGenerateHtml := True;
   FGenerateEmma := True;
   FUseRelativePath := True;
+  FJacoco := True;
 
   FUnitsFiles := TList<string>.create;
   FUnitsIgnore := TList<string>.create;
@@ -403,6 +403,12 @@ begin
     LPaths.Free;
     LUnits.Free;
   end;
+end;
+
+function TCCECoreCodeCoverage.Jacoco(AValue: Boolean): ICCECodeCoverage;
+begin
+  Result := Self;
+  FJacoco := AValue;
 end;
 
 function TCCECoreCodeCoverage.MapFileName(Value: string): ICCECodeCoverage;

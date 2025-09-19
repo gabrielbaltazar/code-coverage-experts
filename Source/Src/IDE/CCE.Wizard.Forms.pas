@@ -71,6 +71,7 @@ type
     imgAddIgnoreUnit: TImage;
     pmIgnoreUnits: TPopupMenu;
     Delete1: TMenuItem;
+    ChkJacoco: TCheckBox;
     procedure tvPathsDblClick(Sender: TObject);
     procedure imgRunClick(Sender: TObject);
     procedure imgSaveClick(Sender: TObject);
@@ -219,11 +220,11 @@ var
   var
     LParent: TTreeNode;
   begin
-    result := ANode.Text;
+    Result := ANode.Text;
     LParent := ANode.Parent;
     while LParent <> nil do
     begin
-      result := LParent.Text + '\' + result;
+      Result := LParent.Text + '\' + Result;
       LParent := LParent.Parent;
     end;
   end;
@@ -341,23 +342,23 @@ function TCCEWizardForms.GetKeyNode(ANode: TTreeNode): String;
 var
   nodeParent: TTreeNode;
 begin
-  result := ANode.Text;
+  Result := ANode.Text;
   nodeParent := ANode.Parent;
   while nodeParent <> nil do
   begin
-    result := nodeParent.Text + '\' + Result;
+    Result := nodeParent.Text + '\' + Result;
     nodeParent := nodeParent.Parent;
   end;
 
-  if result.EndsWith('\') then
-    result := Copy(Result, 1, result.Length - 1);
+  if Result.EndsWith('\') then
+    Result := Copy(Result, 1, Result.Length - 1);
 end;
 
 function TCCEWizardForms.GetNode(APath: String): TTreeNode;
 begin
-  result := nil;
+  Result := nil;
   if FTreeNodes.ContainsKey(APath) then
-    result := FTreeNodes.Items[APath];
+    Result := FTreeNodes.Items[APath];
 end;
 
 procedure TCCEWizardForms.HideTabs;
@@ -469,7 +470,7 @@ end;
 
 function TCCEWizardForms.Project(Value: IOTAProject): TCCEWizardForms;
 begin
-  result := Self;
+  Result := Self;
 
 //  if (not Assigned(FProject)) or (FProject.DprFileName <> Value.FileName) then
   begin
@@ -604,7 +605,8 @@ begin
     .GenerateXml(chkXmlReport.Checked)
     .GenerateEmma(chkEmmaReport.Checked)
     .GenerateLog(chkLog.Checked)
-    .UseRelativePath(chkUseRelativePath.Checked);
+    .UseRelativePath(chkUseRelativePath.Checked)
+    .Jacoco(ChkJacoco.Checked);
 end;
 
 procedure TCCEWizardForms.tvPathsDblClick(Sender: TObject);
